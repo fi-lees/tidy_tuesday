@@ -8,6 +8,6 @@ My #TidyTuesday visualisations are shown below along with links to my code. Ther
 
 ## 2021
 
-### Week 37 - Formula One Motor Racing [(code)](https://github.com/fi-lees/tidy_tuesday/blob/main/TT_2021_W37_Formula_1/TT_2021_W37_Formula_1.R)
+### Week 37 - Formula One Motor Racing [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/TT_2021_W37_Formula_1/TT_2021_W37_Formula_1.R)
 ![/TT_2021_W37_Formula_1/Mercedes_2021.png](TT_2021_W37_Formula_1/Mercedes_2021.png)
 
