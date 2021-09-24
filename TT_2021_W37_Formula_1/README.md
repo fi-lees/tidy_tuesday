@@ -149,7 +149,7 @@ I'm interested in rivalries within and between teams. I'm going to focus on:
 
 #### Mercedes: Lewis Hamilton vs. Valtteri Bottas  
 **Q:** In which years did Hamilton and/or Bottas drive for Mercedes? Did they drive in the same number of races?  
-**A:** Hamilton has driven for Mercedes since 2013. Bottas joined the team in 2017. Since 2017, they have driven in the same number of races each season, except for 2020 when Hamilton missed a race (self-isolating due to covid).
+**A:** Hamilton has driven for Mercedes since 2013. Bottas joined the team in 2017. Since 2017, they have driven in the same number of races each season, except for 2020 when Hamilton missed one race (self-isolating due to covid).
 
 
 ```r
@@ -187,10 +187,11 @@ results_new %>%
   group_by(year) %>% 
   filter(round == max(round)) %>% 
   ungroup() %>% 
-  ggplot(aes(x = positionSeason, y = year, colour = code)) +
+  ggplot(aes(x = year, y = positionSeason, colour = code)) +
   geom_point(size = 3) +
   geom_line(aes(group = year)) +
-  labs(title = "Final standing of Lewis Hamilton and Valtteri Bottas each season between 2017 and 2020")
+  labs(title = "Final standing of Lewis Hamilton and Valtteri Bottas each season between 2017 and 2020") +
+  coord_flip()
 ```
 
 <img src="README_files/figure-html/within_team_2-1.png" width="100%" style="display: block; margin: auto;" />
@@ -203,11 +204,12 @@ results_new %>%
 ```r
 results_new %>%
   filter(year == 2021, constructorName == "Mercedes") %>%
-  ggplot(aes(x = positionOrderRace, y = fct_reorder(raceNameNum, desc(round)), colour = code)) +
+  ggplot(aes(x = fct_reorder(raceNameNum, desc(round)), y = positionOrderRace, colour = code)) +
   geom_point(size = 3) +
   geom_line(aes(group = round)) +
-  scale_x_continuous(limits = c(1, 20), breaks = seq(1, 20, 1)) +
-  labs(title = "Finishing positions of Lewis Hamilton and Valtteri Bottas in each race this season")
+  scale_y_continuous(limits = c(1, 20), breaks = seq(1, 20, 1)) +
+  labs(title = "Finishing positions of Lewis Hamilton and Valtteri Bottas in each race this season") +
+  coord_flip()
 ```
 
 <img src="README_files/figure-html/within_team_3-1.png" width="100%" style="display: block; margin: auto;" />
@@ -279,12 +281,13 @@ constructor_results_new %>%
   group_by(year) %>% 
   filter(round == max(round)) %>% 
   ungroup() %>% 
-  ggplot(aes(x = positionSeason, y = year, colour = constructorName)) +
+  ggplot(aes(x = year, y = positionSeason, colour = constructorName)) +
   geom_point(size = 3) +
   geom_line(aes(group = year)) +
-  scale_x_continuous(limits = c(1, 10), breaks = seq(1, 10, 1)) +
-  scale_y_continuous(limits = c(2005, 2020), breaks = seq(2005, 2020, 1)) +
-  labs(title = "Final standing of Mercedes and Red Bull each season between 2005 and 2020")
+  scale_x_continuous(limits = c(2005, 2020), breaks = seq(2005, 2020, 1)) +
+  scale_y_continuous(limits = c(1, 10), breaks = seq(1, 10, 1)) +
+  labs(title = "Final standing of Mercedes and Red Bull each season between 2005 and 2020") +
+  coord_flip()
 ```
 
 <img src="README_files/figure-html/between_teams_2-1.png" width="100%" style="display: block; margin: auto;" />
@@ -297,11 +300,12 @@ constructor_results_new %>%
 ```r
 results_new %>%
   filter(year == 2021, constructorName %in% c("Mercedes", "Red Bull")) %>%
-  ggplot(aes(x = positionOrderRace, y = fct_reorder(raceNameNum, desc(round)), colour = code)) +
+  ggplot(aes(x = fct_reorder(raceNameNum, desc(round)), y = positionOrderRace, colour = code)) +
   geom_point(size = 3) +
   geom_line(aes(group = round)) +
-  scale_x_continuous(limits = c(1, 20), breaks = seq(1, 20, 1)) +
-  labs(title = "Finishing positions of Mercedes and Red Bull drivers in each race this season")
+  scale_y_continuous(limits = c(1, 20), breaks = seq(1, 20, 1)) +
+  labs(title = "Finishing positions of Mercedes and Red Bull drivers in each race this season") +
+  coord_flip()
 ```
 
 <img src="README_files/figure-html/between_teams_3-1.png" width="100%" style="display: block; margin: auto;" />
@@ -328,15 +332,33 @@ Next, define a colour palette for drivers and teams.
 
 ```r
 # Mercedes only chart
-driver_colours_1 = c("HAM" = "#004d49", "BOT" = "#00ccc2")
-# Tweak the drivers colour slightly when using for labels (make darker to give better contrast against white background)
-ham_lab_colour = "#004d49"
-bot_lab_colour = "#00b3aa"
-Other_lab_colour = "#7e7d82"
+driver_colours_1 = c("HAM" = "#004d46", "BOT" = "#00b3a4")
+mer_lab_colour = "#001a17"
+ham_lab_colour = "#004d46"
+bot_lab_colour = "#00998c" # make one shade darker than point colour to make text easier to read.
 
 # Mercedes vs. Red Bull chart
-driver_colours_2 = c("HAM" = "#006661", "BOT" = "#83afac", "VER" = "#db340a", "PER" = "#f37859")
+driver_colours_2 = c("HAM" = "#006661", "BOT" = "#83afac", "VER" = "#db340a", "PER" = "#f58b70")
 ```
+
+Set the theme for the visualisations.
+
+
+```r
+theme_set(theme_minimal())
+
+theme_update(text = element_text(colour = "grey50"),
+             panel.grid.minor = element_blank(),
+             plot.margin = margin(rep(8, 4)),
+             axis.text = element_text(size = 12),
+             axis.title = element_text(size = 12),
+             axis.title.x = element_text(hjust = 0.955, margin = margin(t = 5, b = 10)),
+             plot.title = element_text(size = 16, face = "bold", margin = margin(t = 5, b = 5)),
+             plot.subtitle = element_text(size = 13, margin = margin(b = 10)),
+             legend.position = "none"
+             )
+```
+
 
   
 #### Mercedes: Lewis Hamilton vs. Valtteri Bottas 2021
@@ -363,62 +385,41 @@ Build the visualisation:
 Mercedes_2021 <- results_new %>%
   filter(year == 2021, constructorName == "Mercedes") %>%
   ggplot(aes(
-    x = positionOrderRace,
-    y = fct_reorder(raceNameNum, desc(round)),
+    x = fct_reorder(raceNameNum, desc(round)),
+    y = positionOrderRace,
     colour = code
   )) +
   # Add a 'finishing line'
-  geom_vline(
-    xintercept = 1,
+  geom_hline(
+    yintercept = 1,
     linetype = "dashed",
-    colour = "#db340a", #dark orange
+    colour = "orangered2",
     size = 1
   ) +
-  geom_line(aes(group = raceNameNum), colour = Other_lab_colour) +
-  geom_point(size = 3.5) +
+  geom_line(aes(group = raceNameNum)) +
+  geom_point(size = 4) +
   scale_colour_manual(values = driver_colours_1) +
   # Reverse the finishing position scale so that the driver with the best 
-  # finishing position looks like they are in the lead.
-  scale_x_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
-  theme_minimal() +
+  # finishing position looks like they are in the lead
+  scale_y_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
   theme(
-    legend.position = "none",
-    plot.title = element_markdown(
-      size = 18,
-      colour = ham_lab_colour,
-      face = "bold",
-      margin = margin(t = 5, r = 0, b = 5, l = 0)
-    ),
-    plot.subtitle = element_markdown(
-      size = 14,
-      colour = Other_lab_colour,
-      margin = margin(t = 0, r = 0, b = 10, l = 0)
-    ),
-    plot.caption = element_markdown(
-      colour = Other_lab_colour
-      ),
-    # colour code the y-axis label to match the driver who finished first
-    axis.text.y = element_text (size = 12, colour = label_colours$lab_colour),
-    axis.text.x = element_text (size = 12, colour = Other_lab_colour),
-    axis.title.x = element_text(
-      size = 12,
-      colour = ham_lab_colour,
-      hjust = 0.955,
-      margin = margin(t = 5, r = 0, b = 10, l = 0)
-    ),
-    panel.grid.minor = element_blank(),
-    plot.margin = margin(rep(8, 4)),
+    plot.title = element_text(colour = mer_lab_colour),
+    plot.subtitle = element_markdown(),
+    # Colour code the y-axis label to match the driver who finished first
+    axis.text.y = element_text(colour = label_colours$lab_colour),
+    axis.title.x = element_text(colour = mer_lab_colour)
   ) +
   labs(
     title = "Mercedes 2021: Hamilton is outperforming his teammate",
     subtitle = "Finishing positions of
-       <b style='color:#004d49'>Lewis Hamilton</b>
+       <b style='color:#004d46'>Lewis Hamilton</b>
        and
-       <b style='color:#00b3aa'>Valtteri Bottas</b> in each race this season",
-    x = "Position\n(1 = win)",
-    y = "",
+       <b style='color:#00998c'>Valtteri Bottas</b> in each race this season",
+    y = "Position\n(1 = win)",
+    x = "",
     caption = "Tidy Tuesday: Week 37, 2021 | Data source: Ergast API | Visualisation: @Fi_Lees"
   ) +
+  coord_flip() +
   # Add the checkered flag image to sit above the 'finishing line'
   patchwork::inset_element(
     p = check_flag_image,
@@ -427,7 +428,7 @@ Mercedes_2021 <- results_new %>%
     r = 0.99,
     t = 0.97,
     align_to = "full"
-  )
+  ) 
 
 Mercedes_2021
 ```
@@ -445,6 +446,7 @@ ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in")
 Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes drivers Lewis Hamilton and Valtteri Bottas in each race this season (2021). Hamilton has won four out fourteen races in the 2021 season. Bottas hasn't won any yet, but has finished ahead of Hamilton in three races. The 2021 season hasn't finished yet. Data sourced from Ergast API (https://ergast.com/mrd/db/#csv).
 
   
+  
 #### Mercedes vs. Red Bull 2021
 
 I built a similar visualisation for all four Mercedes and Red Bull drivers. I've toned it down a bit, but maybe it's still too much with four drivers? 
@@ -454,55 +456,37 @@ I built a similar visualisation for all four Mercedes and Red Bull drivers. I've
 Mercedes_Redbull_2021 <- results_new %>%
   filter(year == 2021, constructorName %in% c("Mercedes", "Red Bull")) %>%
   ggplot(aes(
-    x = positionOrderRace,
-    y = fct_reorder(raceNameNum, desc(round)),
+    x = fct_reorder(raceNameNum, desc(round)),
+    y = positionOrderRace,
     colour = code
   )) +
-  geom_vline(
-    xintercept = 1,
+  geom_hline(
+    yintercept = 1,
     linetype = "dashed",
-    colour = Other_lab_colour,
+    colour = "grey50",
     size = 1
   ) +
-  geom_line(aes(group = raceNameNum), colour = Other_lab_colour) +
+  geom_line(aes(group = raceNameNum), colour = "grey50") +
   geom_point(size = 4) +
   scale_colour_manual(values = driver_colours_2) +
-  scale_x_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
-  theme_minimal() +
+  scale_y_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
   theme(
-    legend.position = "none",
-    plot.title = element_markdown(
-      size = 16,
-      colour = "black",
-      face = "bold",
-      margin = margin(t = 5, r = 0, b = 5, l = 0)
-    ),
-    plot.subtitle = element_markdown(
-      size = 12,
-      colour = Other_lab_colour,
-      margin = margin(t = 0, r = 0, b = 10, l = 0)
-    ),
-    plot.caption = element_text(colour = Other_lab_colour),
-    axis.text.y = element_text (size = 12, colour = "black"),
-    axis.text.x = element_text (size = 12, colour = "black"),
-    axis.title.x = element_text(
-      size = 12,
-      colour = "black",
-      hjust = 0.955,
-      margin = margin(t = 5, r = 0, b = 10, l = 0)
-    ),
-    panel.grid.minor = element_blank(),
-    plot.margin = margin(rep(8, 4)),
+    plot.title = element_markdown(colour = "black"),
+    plot.subtitle = element_markdown(),
+    axis.text.y = element_text (colour = "black"),
+    axis.text.x = element_text (colour = "black"),
+    axis.title.x = element_text(colour = "black")
   ) +
   labs(
     title = "Formula 1 2021: <b style='color:#006661'>Mercedes</b> and <b style='color:#db340a'>Red Bull</b> battle for the top spot",
     subtitle = "Finishing positions of Mercedes and Red Bull  drivers in each race this season<br><br> 
-       <b style='color:#006661'> Lewis Hamilton </b> | <b style='color:#83afac'> Valtteri Bottas </b> |
-       <b style='color:#db340a'> Max Verstappen </b> | <b style='color:#f37859'> Sergio Pérez </b>",
-    x = "Position\n(1 = win)",
-    y = "",
+       <b style='color:#006661'> Lewis Hamilton </b> | <b style='color:#639c98'> Valtteri Bottas </b> |
+       <b style='color:#db340a'> Max Verstappen </b> | <b style='color:#f26440'> Sergio Pérez </b>",
+    y = "Position\n(1 = win)",
+    x = "",
     caption = "Tidy Tuesday: Week 37, 2021 | Data source: Ergast API | Visualisation: @Fi_Lees"
   ) +
+  coord_flip() +
   patchwork::inset_element(
     p = check_flag_image,
     l = 0.939,

@@ -1,8 +1,8 @@
-# Tidy Tuesday - Formula One Motor Racing -------------------------------------------------------------
+# Tidy Tuesday - W37 - Formula One Motor Racing -------------------------------------------------------
 #
 # R-script for producing Tidy Tuesday data visualisations (2021, week 37). 
 #
-# Date: 2021-09-07 - Week 37
+# Date: 2021-09-24
 #
 # Author: Fiona Lees
 #
@@ -23,7 +23,7 @@ library(tidyverse)
 
 ### Import Data ---------------------------------------------------------------------------------------
 
-# This week I'm importing the data directly from the Ergast website and storing it locally. 
+# Import the data directly from the Ergast website. 
 
 # Download
 download.file("http://ergast.com/downloads/f1db_csv.zip", destfile = "data/f1db.zip")
@@ -90,31 +90,42 @@ results_new <-  results_new %>%
 glimpse(results_new)
 
  
-### Set-up External Images and Colour Palette  --------------------------------------------------------
+### Set-up External Images, Colour Palette and Theme --------------------------------------------------
 
 # Import a public domain image of a checkered flag to use in the visualisations. 
 # Sourced from [the Noun Project](https://thenounproject.com/).
 check_flag_image <- readPNG(
   "noun_check_flag.png", 
   native = TRUE, 
-  info = TRUE
-  )
+  info = TRUE)
 
-# Define a colour palette for drivers and teams.
+# Define a colour palette for drivers and teams
 # Mercedes only chart
-driver_colours_1 = c("HAM" = "#004d49", "BOT" = "#00ccc2")
-
-# Tweak the drivers colour slightly when using for labels 
-# (make darker to give better contrast against white background)
-ham_lab_colour = "#004d49"
-bot_lab_colour = "#00b3aa"
-Other_lab_colour = "#7e7d82"
-
+driver_colours_1 = c("HAM" = "#004d46", "BOT" = "#00b3a4")
+mer_lab_colour = "#001a17"
+ham_lab_colour = "#004d46"
+bot_lab_colour = "#00998c" # make one shade darker than point colour to make text easier to read
 # Mercedes vs. Red Bull chart
-driver_colours_2 = c("HAM" = "#006661", "BOT" = "#83afac", "VER" = "#db340a", "PER" = "#f37859")
+driver_colours_2 = c("HAM" = "#006661", "BOT" = "#83afac", "VER" = "#db340a", "PER" = "#f58b70")
+
+# Set the theme for the visualisations
+theme_set(theme_minimal())
+
+theme_update(text = element_text(colour = "grey50"),
+             panel.grid.minor = element_blank(),
+             plot.margin = margin(rep(8, 4)),
+             axis.text = element_text(size = 12),
+             axis.title = element_text(size = 12),
+             axis.title.x = element_text(hjust = 0.955, margin = margin(t = 5, b = 10)),
+             plot.title = element_text(size = 16, face = "bold", margin = margin(t = 5, b = 5)),
+             plot.subtitle = element_text(size = 13, margin = margin(b = 10)),
+             legend.position = "none"
+             )
 
 
-### Visualise Lewis Hamilton vs. Valtteri Bottas 2021 -------------------------------------------------
+### Visualise Data ------------------------------------------------------------------------------------
+
+# Mercedes: Lewis Hamilton vs. Valtteri Bottas 2021
 
 # Set the colour for the y-axis labels to match the driver who finished ahead in each race
 label_colours <- results_new %>%
@@ -131,62 +142,41 @@ label_colours <- results_new %>%
 Mercedes_2021 <- results_new %>%
   filter(year == 2021, constructorName == "Mercedes") %>%
   ggplot(aes(
-    x = positionOrderRace,
-    y = fct_reorder(raceNameNum, desc(round)),
+    x = fct_reorder(raceNameNum, desc(round)),
+    y = positionOrderRace,
     colour = code
   )) +
   # Add a 'finishing line'
-  geom_vline(
-    xintercept = 1,
+  geom_hline(
+    yintercept = 1,
     linetype = "dashed",
-    colour = "#db340a", #dark orange
+    colour = "orangered2",
     size = 1
   ) +
-  geom_line(aes(group = raceNameNum), colour = Other_lab_colour) +
-  geom_point(size = 3.5) +
+  geom_line(aes(group = raceNameNum)) +
+  geom_point(size = 4) +
   scale_colour_manual(values = driver_colours_1) +
   # Reverse the finishing position scale so that the driver with the best 
   # finishing position looks like they are in the lead
-  scale_x_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
-  theme_minimal() +
+  scale_y_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
   theme(
-    legend.position = "none",
-    plot.title = element_markdown(
-      size = 18,
-      colour = ham_lab_colour,
-      face = "bold",
-      margin = margin(t = 5, r = 0, b = 5, l = 0)
-    ),
-    plot.subtitle = element_markdown(
-      size = 14,
-      colour = Other_lab_colour,
-      margin = margin(t = 0, r = 0, b = 10, l = 0)
-    ),
-    plot.caption = element_markdown(
-      colour = Other_lab_colour
-      ),
+    plot.title = element_text(colour = mer_lab_colour),
+    plot.subtitle = element_markdown(),
     # Colour code the y-axis label to match the driver who finished first
-    axis.text.y = element_text (size = 12, colour = label_colours$lab_colour),
-    axis.text.x = element_text (size = 12, colour = Other_lab_colour),
-    axis.title.x = element_text(
-      size = 12,
-      colour = ham_lab_colour,
-      hjust = 0.955,
-      margin = margin(t = 5, r = 0, b = 10, l = 0)
-    ),
-    panel.grid.minor = element_blank(),
-    plot.margin = margin(rep(8, 4)),
+    axis.text.y = element_text(colour = label_colours$lab_colour),
+    axis.title.x = element_text(colour = mer_lab_colour)
   ) +
   labs(
     title = "Mercedes 2021: Hamilton is outperforming his teammate",
     subtitle = "Finishing positions of
-       <b style='color:#004d49'>Lewis Hamilton</b>
-  and
-<b style='color:#00b3aa'>Valtteri Bottas</b> in each race this season",
-    x = "Position\n(1 = win)",
-    y = "",
+        <b style='color:#004d46'>Lewis Hamilton</b>
+        and
+        <b style='color:#00998c'>Valtteri Bottas</b> in each race this season",
+    y = "Position\n(1 = win)",
+    x = "",
     caption = "Tidy Tuesday: Week 37, 2021 | Data source: Ergast API | Visualisation: @Fi_Lees"
   ) +
+  coord_flip() +
   # Add the checkered flag image to sit above the 'finishing line'
   patchwork::inset_element(
     p = check_flag_image,
@@ -195,69 +185,50 @@ Mercedes_2021 <- results_new %>%
     r = 0.99,
     t = 0.97,
     align_to = "full"
-  )
+  ) 
 
 Mercedes_2021
-
-# Save this visualisation:
+# Save this visualisation
 ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in")
 
-  
-### Visualise Mercedes vs. Red Bull 2021 ----------------------------------------------------------
+
+# Mercedes vs. Red Bull 2021
 
 # Build the visualisation
 Mercedes_Redbull_2021 <- results_new %>%
   filter(year == 2021, constructorName %in% c("Mercedes", "Red Bull")) %>%
   ggplot(aes(
-    x = positionOrderRace,
-    y = fct_reorder(raceNameNum, desc(round)),
+    x = fct_reorder(raceNameNum, desc(round)),
+    y = positionOrderRace,
     colour = code
   )) +
-  geom_vline(
-    xintercept = 1,
+  geom_hline(
+    yintercept = 1,
     linetype = "dashed",
-    colour = Other_lab_colour,
+    colour = "grey50",
     size = 1
   ) +
-  geom_line(aes(group = raceNameNum), colour = Other_lab_colour) +
+  geom_line(aes(group = raceNameNum), colour = "grey50") +
   geom_point(size = 4) +
   scale_colour_manual(values = driver_colours_2) +
-  scale_x_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
-  theme_minimal() +
+  scale_y_reverse(limits = c(20, 1), breaks = seq(1, 20, 1)) +
   theme(
-    legend.position = "none",
-    plot.title = element_markdown(
-      size = 16,
-      colour = "black",
-      face = "bold",
-      margin = margin(t = 5, r = 0, b = 5, l = 0)
-    ),
-    plot.subtitle = element_markdown(
-      size = 12,
-      colour = Other_lab_colour,
-      margin = margin(t = 0, r = 0, b = 10, l = 0)
-    ),
-    plot.caption = element_text(colour = Other_lab_colour),
-    axis.text.y = element_text (size = 12, colour = "black"),
-    axis.text.x = element_text (size = 12, colour = "black"),
-    axis.title.x = element_text(
-      size = 12,
-      colour = "black",
-      hjust = 0.955,
-      margin = margin(t = 5, r = 0, b = 10, l = 0)
-    ),
-    panel.grid.minor = element_blank(),
-    plot.margin = margin(rep(8, 4)),
+    plot.title = element_markdown(colour = "black"),
+    plot.subtitle = element_markdown(),
+    axis.text.y = element_text (colour = "black"),
+    axis.text.x = element_text (colour = "black"),
+    axis.title.x = element_text(colour = "black")
   ) +
   labs(
     title = "Formula 1 2021: <b style='color:#006661'>Mercedes</b> and <b style='color:#db340a'>Red Bull</b> battle for the top spot",
     subtitle = "Finishing positions of Mercedes and Red Bull  drivers in each race this season<br><br> 
-  <b style='color:#006661'> Lewis Hamilton </b> | <b style='color:#83afac'> Valtteri Bottas </b> |
-  <b style='color:#db340a'> Max Verstappen </b> | <b style='color:#f37859'> Sergio Pérez </b>",
-    x = "Position\n(1 = win)",
-    y = "",
+       <b style='color:#006661'> Lewis Hamilton </b> | <b style='color:#639c98'> Valtteri Bottas </b> |
+       <b style='color:#db340a'> Max Verstappen </b> | <b style='color:#f26440'> Sergio Pérez </b>",
+    y = "Position\n(1 = win)",
+    x = "",
     caption = "Tidy Tuesday: Week 37, 2021 | Data source: Ergast API | Visualisation: @Fi_Lees"
   ) +
+  coord_flip() +
   patchwork::inset_element(
     p = check_flag_image,
     l = 0.939,
@@ -268,8 +239,13 @@ Mercedes_Redbull_2021 <- results_new %>%
   )
 
 Mercedes_Redbull_2021
-
-# Save this visualisation:
+# Save this visualisation
 ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in")
 
 
+
+
+
+
+
+ 
