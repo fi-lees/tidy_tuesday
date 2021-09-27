@@ -189,7 +189,7 @@ Mercedes_2021 <- results_new %>%
 
 Mercedes_2021
 # Save this visualisation
-ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in", dpi = 300)
+ggsave("Mercedes_2021.png", Mercedes_2021, width = 13, height = 9, units = "in", dpi = 300, scale = 0.8)
 
 
 # Mercedes vs. Red Bull 2021
@@ -240,7 +240,7 @@ Mercedes_Redbull_2021 <- results_new %>%
 
 Mercedes_Redbull_2021
 # Save this visualisation
-ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in", dpi = 300)
+ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 13, height = 9, units = "in", dpi = 300, scale = 0.8)
 
 
 

@@ -358,7 +358,7 @@ label_colours <- results_new %>%
 
 Build the visualisation:
 
-```{r Visualise_mercedes_2021, fig.asp = 0.7, fig.alt = "Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes drivers Lewis Hamilton and Valtteri Bottas in each race this season. Hamilton has won five out fifteen races in the 2021 season so far. Bottas hasn't won any races yet, but has finished ahead of Hamilton in three races."}
+```{r Visualise_mercedes_2021, fig.asp = 0.75, fig.alt = "Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes drivers Lewis Hamilton and Valtteri Bottas in each race this season. Hamilton has won five out fifteen races in the 2021 season so far. Bottas hasn't won any races yet, but has finished ahead of Hamilton in three races."}
 
 Mercedes_2021 <- results_new %>%
   filter(year == 2021, constructorName == "Mercedes") %>%
@@ -416,7 +416,7 @@ Save this visualisation:
 
 ```{r save_Mercedes_2021}
 
-ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in", dpi = 300)
+ggsave("Mercedes_2021.png", Mercedes_2021, width = 13, height = 9, units = "in", dpi = 300, scale = 0.8)
 
 ```
 
@@ -426,7 +426,7 @@ ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in",
 
 I built a similar visualisation for all four Mercedes and Red Bull drivers. I've toned it down a bit, but maybe it's still too much with four drivers? 
 
-```{r Visualise_mercedes_Redbull_2021, fig.asp = 0.7, fig.alt = "Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes and Red Bull drivers in each race this season (2021). Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first five times (Hamilton 5 wins, Bottas 0 wins). There have only been two races this season where a Mercedes or Red Bull driver did not win."}
+```{r Visualise_mercedes_Redbull_2021, fig.asp = 0.75, fig.alt = "Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes and Red Bull drivers in each race this season (2021). Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first five times (Hamilton 5 wins, Bottas 0 wins). There have only been two races this season where a Mercedes or Red Bull driver did not win."}
 
 Mercedes_Redbull_2021 <- results_new %>%
   filter(year == 2021, constructorName %in% c("Mercedes", "Red Bull")) %>%
@@ -478,7 +478,7 @@ Save this visualisation:
 
 ```{r save_Mercedes_Redbull_2021}
 
-ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in", dpi = 300)
+ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 13, height = 9, units = "in", dpi = 300, scale = 0.8)
 
 ```
 
