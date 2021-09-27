@@ -1,14 +1,3 @@
----
-title: "Tidy Tuesday: 2021, Week 37, Formula One"
-author: "Fiona Lees"
-date: 2021-09-27
-output: 
-  html_document: 
-    keep_md: yes
----
-
-
-
 ## Formula One Motor Racing
 The data this week comes from the [Ergast API](https://ergast.com/mrd/db/#csv). The Ergast Developer API is an experimental web service that provides a historical record of motor racing data for non-commercial purposes. The API provides data for the Formula One series, from the beginning of the world championships in 1950 until present day.  
 
