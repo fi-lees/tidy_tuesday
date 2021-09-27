@@ -1,3 +1,14 @@
+---
+title: "Tidy Tuesday: 2021, Week 37, Formula One"
+author: "Fiona Lees"
+date: 2021-09-27
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+
+
 ## Formula One Motor Racing
 The data this week comes from the [Ergast API](https://ergast.com/mrd/db/#csv). The Ergast Developer API is an experimental web service that provides a historical record of motor racing data for non-commercial purposes. The API provides data for the Formula One series, from the beginning of the world championships in 1950 until present day.  
 
@@ -23,7 +34,7 @@ library(tidyverse)
 ```
 
 ### Import Data
-This week I'm importing the data directly from the Ergast website and storing it locally. 
+This week I'm importing the data directly from the Ergast website (so that I can use the most recent results). 
 
 
 ```r
@@ -173,7 +184,7 @@ results_new %>%
 ## 6  2018    21    21
 ## 7  2019    21    21
 ## 8  2020    16    17
-## 9  2021    14    14
+## 9  2021    15    15
 ```
 
   
@@ -267,7 +278,7 @@ results_new %>%
 ## 16  2018       42         42
 ## 17  2019       42         42
 ## 18  2020       34         34
-## 19  2021       28         28
+## 19  2021       30         30
 ```
 
   
@@ -294,7 +305,7 @@ constructor_results_new %>%
 
   
 **Q:** Where did the Mercedes and Red Bull drivers finish in each race this season (2021)?  
-**A:** Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first four times (Hamilton 4 wins, Bottas 0 wins). There have only been two races this season where either a Mercedes or Red Bull driver did not win.  
+**A:** Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first five times (Hamilton 5 wins, Bottas 0 wins). There have only been two races this season where a Mercedes or Red Bull driver did not win (races 11 and 14).  
 
 
 ```r
@@ -423,29 +434,26 @@ Mercedes_2021 <- results_new %>%
   # Add the checkered flag image to sit above the 'finishing line'
   patchwork::inset_element(
     p = check_flag_image,
-    l = 0.939,
+    l = 0.94,
     b = 0.89,
     r = 0.99,
-    t = 0.97,
+    t = 0.99,
     align_to = "full"
   ) 
 
 Mercedes_2021
 ```
 
-<img src="README_files/figure-html/Visualise_mercedes_2021-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/Visualise_mercedes_2021-1.png" title="Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes drivers Lewis Hamilton and Valtteri Bottas in each race this season. Hamilton has won five out fifteen races in the 2021 season so far. Bottas hasn't won any races yet, but has finished ahead of Hamilton in three races." alt="Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes drivers Lewis Hamilton and Valtteri Bottas in each race this season. Hamilton has won five out fifteen races in the 2021 season so far. Bottas hasn't won any races yet, but has finished ahead of Hamilton in three races." width="100%" style="display: block; margin: auto;" />
 
 Save this visualisation:
 
 
 ```r
-ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in")
+ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in", dpi = 300)
 ```
 
-**Alt text for Mercedes_2021.png:**
-Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes drivers Lewis Hamilton and Valtteri Bottas in each race this season (2021). Hamilton has won four out fourteen races in the 2021 season. Bottas hasn't won any yet, but has finished ahead of Hamilton in three races. The 2021 season hasn't finished yet. Data sourced from Ergast API (https://ergast.com/mrd/db/#csv).
 
-  
   
 #### Mercedes vs. Red Bull 2021
 
@@ -489,7 +497,7 @@ Mercedes_Redbull_2021 <- results_new %>%
   coord_flip() +
   patchwork::inset_element(
     p = check_flag_image,
-    l = 0.939,
+    l = 0.94,
     b = 0.85,
     r = 0.99,
     t = 0.95,
@@ -499,16 +507,15 @@ Mercedes_Redbull_2021 <- results_new %>%
 Mercedes_Redbull_2021
 ```
 
-<img src="README_files/figure-html/Visualise_mercedes_Redbull_2021-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/Visualise_mercedes_Redbull_2021-1.png" title="Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes and Red Bull drivers in each race this season (2021). Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first five times (Hamilton 5 wins, Bottas 0 wins). There have only been two races this season where a Mercedes or Red Bull driver did not win." alt="Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes and Red Bull drivers in each race this season (2021). Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first five times (Hamilton 5 wins, Bottas 0 wins). There have only been two races this season where a Mercedes or Red Bull driver did not win." width="100%" style="display: block; margin: auto;" />
 Save this visualisation:
 
 
 ```r
-ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in")
+ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in", dpi = 300)
 ```
 
-**Alt text for Mercedes_2021.png:**
-Connected dot plot (also known as a dumbbell plot), showing the finishing positions of Formula 1 Mercedes and Red Bull drivers in each race this season (2021). Red Bull have finished first in eight races (Verstappen 7 wins, Pérez 1 win). Mercedes have finished first four times (Hamilton 4 wins, Bottas 0 wins). There have only been two races this season where a Mercedes or Red Bull driver did not win. The 2021 season hasn't finished yet. Data sourced from Ergast API (https://ergast.com/mrd/db/#csv).
+
 
 
 

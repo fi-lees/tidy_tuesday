@@ -2,7 +2,7 @@
 #
 # R-script for producing Tidy Tuesday data visualisations (2021, week 37). 
 #
-# Date: 2021-09-24
+# Date: 2021-09-27
 #
 # Author: Fiona Lees
 #
@@ -180,16 +180,16 @@ Mercedes_2021 <- results_new %>%
   # Add the checkered flag image to sit above the 'finishing line'
   patchwork::inset_element(
     p = check_flag_image,
-    l = 0.939,
+    l = 0.94,
     b = 0.89,
     r = 0.99,
-    t = 0.97,
+    t = 0.99,
     align_to = "full"
   ) 
 
 Mercedes_2021
 # Save this visualisation
-ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in")
+ggsave("Mercedes_2021.png", Mercedes_2021, width = 12, height = 8, units = "in", dpi = 300)
 
 
 # Mercedes vs. Red Bull 2021
@@ -231,7 +231,7 @@ Mercedes_Redbull_2021 <- results_new %>%
   coord_flip() +
   patchwork::inset_element(
     p = check_flag_image,
-    l = 0.939,
+    l = 0.94,
     b = 0.85,
     r = 0.99,
     t = 0.95,
@@ -240,7 +240,7 @@ Mercedes_Redbull_2021 <- results_new %>%
 
 Mercedes_Redbull_2021
 # Save this visualisation
-ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in")
+ggsave("Mercedes_Redbull_2021.png", Mercedes_Redbull_2021, width = 12, height = 8, units = "in", dpi = 300)
 
 
 
