@@ -120,7 +120,7 @@ title_words <- papers_new %>%
   ungroup() %>%
   select(-catalogue_series, -month, -word_instance)
 
-# How may words?
+# How many words?
 length(title_words$word)
 ```
 
@@ -204,7 +204,7 @@ other_stopwords <- c(
 title_words_reduced <- title_words %>% 
   filter(!word %in% other_stopwords) 
 
-# How may words now?
+# How many words now?
 length(title_words_reduced$word)
 ```
 
