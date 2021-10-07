@@ -179,7 +179,7 @@ title_words %>%
 ```
   
   
-#### Analysis specific stop words
+#### Other stop words
 There are some common words, in addition to classic stop words, that don't tell us much about the subject of a paper. For example, the word 'evidence' appears in a title around twice as often as any other word. I've created a list of these words and have chosen to filter them out for the rest of this analysis. It was quite hard to decide which words to add to this list and which to leave out - subjective decision making. I swithered over the words 'market' and 'markets', but I've left them in the analysis for the moment.
 
 
@@ -238,7 +238,7 @@ summary_by_decade <- title_words_reduced %>%
     word_freq_n = n(),
     word_freq_pct = (word_freq_n / n_papers) 
     ) %>% 
-  mutate(decade_rank = dense_rank(desc(word_freq_n))) %>% 
+  mutate(decade_rank = min_rank(desc(word_freq_n))) %>% 
   arrange(decade, decade_rank) %>% 
   ungroup()
 
@@ -285,8 +285,7 @@ First, set the theme for the visualisations.
 theme_set(theme_minimal())
 
 theme_update(text = element_text(colour = "grey40"),
-             plot.title = element_text(colour = "black", size = 16, face = "bold", margin = margin(t = 5, b = 5)),
-             plot.subtitle = element_text(size = 12, margin = margin(b = 10)),
+             plot.title = element_text(colour = "black", size = 16, face = "bold", margin = margin(t = 5, b = 10)),
              strip.text.x = element_text(size = 12, vjust = 1),
              axis.text = element_text(size = 11),
              axis.title.x = element_text(margin = margin(t = 10, b = 10), hjust = 0.0),
@@ -299,7 +298,7 @@ theme_update(text = element_text(colour = "grey40"),
 
    
 #### Chart 1: Ten most common title words, by decade (number of times used)
-A helpful first draft, but this chart doesn't account for the increasing number of papers published each decade. The bars are also quite 'heavy'. Note that some words were used the same number of times and rank jointly with other words, so there may be more than ten words listed for each decade. I could have used `slice_head()`rather than `filter()` to keep to ten words, but I chose not to. 
+A helpful first draft, but this chart doesn't account for the increasing number of papers published each decade. The bars are also quite 'heavy'. 
 
 
 ```r
@@ -321,7 +320,6 @@ chart_1 <- summary_by_decade %>%
   scale_y_reordered() +
   facet_wrap(~ decade, scales = "free_y", ncol = 3, labeller = labeller(decade = decade_labels)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        x = "Number of times word was used in a title",
        y = "",
        caption = "Tidy Tuesday: Week 40, 2021 | Data source: NBER (via the nberwp package) | Visualisation: @Fi_Lees")
@@ -329,11 +327,11 @@ chart_1 <- summary_by_decade %>%
 chart_1
 ```
 
-<img src="README_files/figure-html/chart_1-1.png" title="Series of bar charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the number of times a word was used in a title. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." alt="Series of bar charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the number of times a word was used in a title. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/chart_1-1.png" title="Series of bar charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the number of times a word was used in a title. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." alt="Series of bar charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the number of times a word was used in a title. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." width="100%" style="display: block; margin: auto;" />
 
    
 #### Chart 2: Ten most common title words, by decade (percentage of times used)
-This chart accounts for the increasing number of papers each decade by showing the percentage of titles in which a word was used. I've changed it to a lollipop chart to make it less 'heavy'. I've also colour coded the points according to rank (1-10) just to see how this looks.
+This chart accounts for the increasing number of papers each decade by showing the percentage of titles in which the word was used. I've changed it to a lollipop chart to make it less 'heavy'. I've also colour coded the points according to rank (1-10) just to see how this looks and to tie it in with Chart 3 below.
 
 
 ```r
@@ -344,7 +342,7 @@ chart_2 <- summary_by_decade %>%
   # Lollipop stick
   geom_segment(aes(x = 0, xend = word_freq_pct, y = word, yend = word), colour = "grey") +
   # Lollipop head
-  geom_point(aes(x = word_freq_pct, y = word, colour = decade_rank), size = 3.5) +
+  geom_point(aes(x = word_freq_pct, y = word, colour = decade_rank), size = 3) +
   scale_colour_viridis_b(direction = 1, option = "D", end = 0.8) +
   scale_y_reordered() +
   scale_x_continuous(
@@ -354,7 +352,6 @@ chart_2 <- summary_by_decade %>%
     ) +
   facet_wrap(~ decade, scales = "free_y", ncol = 3, labeller = labeller(decade = decade_labels)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        x = "Percentage of titles in which word was used",
        y = "",
        caption = "Tidy Tuesday: Week 40, 2021 | Data source: NBER (via the nberwp package) | Visualisation: @Fi_Lees")
@@ -362,13 +359,11 @@ chart_2 <- summary_by_decade %>%
 chart_2
 ```
 
-<img src="README_files/figure-html/chart_2-1.png" title="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." alt="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/chart_2-1.png" title="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." alt="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." width="100%" style="display: block; margin: auto;" />
 
    
 #### Chart 3: Ten most common title words, by decade (word cloud)
-This shows the same information as Chart 2, but in the form of a word cloud. Word clouds don't provide precise information, but they can give you a quick idea of word frequency. Can be useful when precision isn't the goal.  
-
-There are various parameters that can be tweaked to change the look of a word cloud; this [`ggwordcloud` vignette](https://cran.r-project.org/web/packages/ggwordcloud/vignettes/ggwordcloud.html) gives a really helpful overview.
+This shows the same information as Chart 2, but in the form of a word cloud. Word clouds don't provide precise information, but they can give a quick idea of top word use. They can be useful when precision isn't the goal. There are various parameters that can be tweaked to change the look of a word cloud; this [`ggwordcloud` vignette](https://cran.r-project.org/web/packages/ggwordcloud/vignettes/ggwordcloud.html) gives a really helpful overview.
 
 
 ```r
@@ -391,16 +386,15 @@ chart_3 <- summary_by_decade %>%
   scale_size_area(max_size = 15) +
   scale_colour_viridis_b(direction = 1, option = "D", end = 0.8) +
   facet_wrap(~ decade, ncol = 3, labeller = labeller(decade = decade_labels_2)) +
-  theme(plot.subtitle = element_text(margin = margin(b = 20)),
+  theme(plot.title = element_text(margin = margin(b = 20)),
         strip.text.x = element_text(size = 14, face = "bold", vjust = 1)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        caption = "Tidy Tuesday: Week 40, 2021 | Data source: NBER (via the nberwp package) | Visualisation: @Fi_Lees")
 
 chart_3
 ```
 
-<img src="README_files/figure-html/chart_3-1.png" title="Series of word clouds showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." alt="Series of word clouds showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/chart_3-1.png" title="Series of word clouds showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." alt="Series of word clouds showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." width="100%" style="display: block; margin: auto;" />
 
 Save this visualisation:
 
@@ -444,7 +438,6 @@ chart_4 <- top_ten_decade %>%
     legend.title=element_text(size = 12),
     legend.text=element_text(size = 12)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        x = "Percentage of titles in which word was used",
        y = "",
        colour = "First time in top ten words list? ",
@@ -453,9 +446,9 @@ chart_4 <- top_ten_decade %>%
 chart_4
 ```
 
-<img src="README_files/figure-html/chart_4-1.png" title="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. New entries to the top ten each decade are highlighted. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." alt="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. New entries to the top ten each decade are highlighted. Many words are the same in each decade (market, capital), but some new ones have appeared (risk)." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/chart_4-1.png" title="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. New entries to the top ten each decade are highlighted. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." alt="Series of lollipop charts showing the ten most common words used in the titles of NBER papers in each decade (1970s - 2020s). Data available from June 1973 until July 2021 and presented as the percentage of titles in which a word was used. New entries to the top ten each decade are highlighted. Several words are the same in each decade (e.g. market, labor, economic), but some new ones have appeared (e.g. risk, impact)." width="100%" style="display: block; margin: auto;" />
 
-  
+
 ### Final Notes
 This is a very high level analysis and there are lots of other ways I could have sliced the data and presented it. This is the first time I've tried any text based analysis in R, but I'm looking forward to trying out more sophisticated projects using the `tidytext` package.
 

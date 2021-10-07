@@ -95,7 +95,7 @@ summary_by_decade <- title_words_reduced %>%
     word_freq_n = n(),
     word_freq_pct = (word_freq_n / n_papers) 
     ) %>% 
-  mutate(decade_rank = dense_rank(desc(word_freq_n))) %>% 
+  mutate(decade_rank = min_rank(desc(word_freq_n))) %>% 
   arrange(decade, decade_rank) %>% 
   ungroup()
 
@@ -112,8 +112,7 @@ summary_by_decade %>%
 theme_set(theme_minimal())
 
 theme_update(text = element_text(colour = "grey40"),
-             plot.title = element_text(colour = "black", size = 16, face = "bold", margin = margin(t = 5, b = 5)),
-             plot.subtitle = element_text(size = 12, margin = margin(b = 10)),
+             plot.title = element_text(colour = "black", size = 16, face = "bold", margin = margin(t = 5, b = 10)),
              strip.text.x = element_text(size = 12, vjust = 1),
              axis.text = element_text(size = 11),
              axis.title.x = element_text(margin = margin(t = 10, b = 10), hjust = 0.0),
@@ -149,7 +148,6 @@ chart_1 <- summary_by_decade %>%
   scale_y_reordered() +
   facet_wrap(~ decade, scales = "free_y", ncol = 3, labeller = labeller(decade = decade_labels)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        x = "Number of times word was used in a title",
        y = "",
        caption = "Tidy Tuesday: Week 40, 2021 | Data source: NBER (via the nberwp package) | Visualisation: @Fi_Lees")
@@ -164,7 +162,7 @@ chart_2 <- summary_by_decade %>%
   # Lollipop stick
   geom_segment(aes(x = 0, xend = word_freq_pct, y = word, yend = word), colour = "grey") +
   # Lollipop head
-  geom_point(aes(x = word_freq_pct, y = word, colour = decade_rank), size = 3.5) +
+  geom_point(aes(x = word_freq_pct, y = word, colour = decade_rank), size = 3) +
   scale_colour_viridis_b(direction = 1, option = "D", end = 0.8) +
   scale_y_reordered() +
   scale_x_continuous(
@@ -174,7 +172,6 @@ chart_2 <- summary_by_decade %>%
     ) +
   facet_wrap(~ decade, scales = "free_y", ncol = 3, labeller = labeller(decade = decade_labels)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        x = "Percentage of titles in which word was used",
        y = "",
        caption = "Tidy Tuesday: Week 40, 2021 | Data source: NBER (via the nberwp package) | Visualisation: @Fi_Lees")
@@ -192,10 +189,9 @@ chart_3 <- summary_by_decade %>%
   scale_size_area(max_size = 15) +
   scale_colour_viridis_b(direction = 1, option = "D", end = 0.8) +
   facet_wrap(~ decade, ncol = 3, labeller = labeller(decade = decade_labels_2)) +
-  theme(plot.subtitle = element_text(margin = margin(b = 20)),
+  theme(plot.title = element_text(margin = margin(b = 20)),
         strip.text.x = element_text(size = 14, face = "bold", vjust = 1)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        caption = "Tidy Tuesday: Week 40, 2021 | Data source: NBER (via the nberwp package) | Visualisation: @Fi_Lees")
 
 chart_3
@@ -235,7 +231,6 @@ chart_4 <- top_ten_decade %>%
     legend.title=element_text(size = 12),
     legend.text=element_text(size = 12)) +
   labs(title = "Ten most common words used in the titles of NBER papers, by decade",
-       subtitle = "Some words rank equally, therefore there may be more than ten words listed for each decade",
        x = "Percentage of titles in which word was used",
        y = "",
        colour = "First time in top ten words list? ",
