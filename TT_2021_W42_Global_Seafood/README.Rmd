@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE,
 This week"s data were provided by [Our World in Data](https://ourworldindata.org/seafood-production) (Hannah Ritchie and Max Roser (2019) - "Seafood Production"). The data were originally sourced from the [UN Food and Agriculture Organization Database](https://www.fao.org/faostat/en/#data) and the [UN Food and Agricultural Organization FishStat Database](https://www.fao.org/fishery/statistics/software/fishstatj/en). Our World in Data provide a collection of of charts and data files showing seafood capture / production and supply around the world (1961 - present).
   
 ### Objectives
-This is a dataset with lots of possibilities, but I'm going to focus on fish and seafood supply per capita. I'd like to know more about how supply varies around the world.  
+This is a dataset with lots of possibilities, but I'm going to focus on fish and seafood supply per capita. I'd like to know more about how supply varies around the world. I'm going to attempt to recreate a choropleth map similar to one on the [Our World in Data website](https://ourworldindata.org/fish-and-overfishing#how-much-fish-do-people-eat).  
 
 ### Definitions
 The United Nations Food and Agricultural Organization define fish and seafood supply per capita as the average supply across the population, measured in kilograms per person per year.  
