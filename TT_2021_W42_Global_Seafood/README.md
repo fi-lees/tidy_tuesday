@@ -1,14 +1,3 @@
----
-title: "Tidy Tuesday: 2021, Week 42, Global Fish and Seafood Supply"
-author: "Fiona Lees"
-date: 2021-10-13
-output: 
-  html_document: 
-    keep_md: yes
----
-
-
-
 ## Global Fish and Seafood Supply
 This week"s data were provided by [Our World in Data](https://ourworldindata.org/seafood-production) (Hannah Ritchie and Max Roser (2019) - "Seafood Production"). The data were originally sourced from the [UN Food and Agriculture Organization Database](https://www.fao.org/faostat/en/#data) and the [UN Food and Agricultural Organization FishStat Database](https://www.fao.org/fishery/statistics/software/fishstatj/en). Our World in Data provide a collection of of charts and data files showing seafood capture / production and supply around the world (1961 - present).
   
