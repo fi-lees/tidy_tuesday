@@ -20,13 +20,13 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 ## Ultra Trail Running
-The data this week was taken from the [International Trail Running Association (ITRA) website](https://itra.run/Races/FindRaceResults) and was made available to #TidyTuesday via [Benjamin Nowak](https://twitter.com/BjnNowak). The dataset provides a compilation of results from races that took place between 2012 - 2021 and focuses on 100 mile races (give or take a few miles). 
+The data this week was taken from the [International Trail Running Association (ITRA) website](https://itra.run/Races/FindRaceResults) and was made available to #TidyTuesday via [Benjamin Nowak](https://twitter.com/BjnNowak). The dataset provides a compilation of results from trail races that took place between 2012 - 2021 and focuses on 100 mile races (give or take a few miles). 
 
 
 ### Objectives
-This week I'm going to focus on [The West Highland Way Race](https://westhighlandwayrace.org/); a 95 mile race from Milngavie (just north of Glasgow) to Fort William in the Scottish Highlands. It's one of the world’s longest established ultra-marathons and first took place in 1985. I chose this race because the start line is just a few miles from where I live and I'd like to know more about it.   
+This week I'm going to focus on [The West Highland Way Race](https://westhighlandwayrace.org/); a 95 mile race from Milngavie (just north of Glasgow) to Fort William in the Scottish Highlands. It's one of the world’s longest established ultra-marathons and first took place in 1985. I chose this race because the start line is just a few miles from where I live.   
 
-Due to the COVID-19 pandemic, the race was cancelled in 2020 and 2021, so I'm going to look at the most recent data available (2019). My objective is to visualise the distribution of finish times (in hours) by gender and age.
+Due to the COVID-19 pandemic, the race was cancelled in 2020 and 2021, so I'm going to look at the most recent data available (2019). My objective is to visualise the distribution of finish times (in hours).
 
 
 ### Learning Points
@@ -51,7 +51,6 @@ library(sysfonts)
 library(ggtext)
 library(patchwork)
 library(magick)
-library(plotly)
 library(sf)
 library(rnaturalearth)
 library(tidyverse)
@@ -70,7 +69,7 @@ race <- readr::read_csv(
   )
 
 # For the ranking data, use Benjamin's link so that time values above 24hrs are not lost
-# (reading time as an character string)
+# (reading time as a character string)
 rankings <- readr::read_csv(
   "https://raw.githubusercontent.com/BjnNowak/UltraTrailRunning/main/ranking.csv",
   col_types = list(Time = "c")
@@ -338,7 +337,7 @@ whwr_race_rankings %>%
 
 ```
 
-In the end, I decided it would be more useful to retain the gender groupings and plot the finish hour data against the runner's age (a more conventional scatter plot). This makes it easier to see the age range of runners who finished in each hour. It has the added benefit of retaining the runner's gender information. Placed along side the gender chart I created above, I think this tells a more interesting story about the runners who finished in each hour. For example, you can see that everyone who finished by hour 24 was under 60 years of age.  
+In the end, I decided it would be more useful to retain the gender groupings and plot the finish hour data against the runner's age (a more conventional strip plot). This makes it easier to see the age range of runners who finished in each hour. It has the added benefit of retaining the runner's gender information. Placed along side the gender chart created above, I think this tells a more interesting story about the runners who finished in each hour. For example, you can see that everyone who finished by hour 24 was under 60 years of age.  
 
 ```{r age_chart_3, fig.asp = 0.5, fig.alt = "Scatter plot showing finishing hour versus runner's age. Each dot represents one runner, colour coded according to runner's gender."}
 
@@ -440,7 +439,7 @@ Create the final chart showing the number of runners who finished in each hour, 
 ```{r gender_final, fig.asp = 0.5, fig.alt = "Ordered dot plot showing the number of runners who finished in each hour, by gender. Each dot represents one runner. The dots are ordered according to the runner's finishing position within each hour, with those who finished first shown at the bottom of each dotted bar."}
 
 p_gender_final <- whwr_race_rankings %>% 
-  ggplot(aes(x = finish_hour, y = hour_rank, colour = gender, text = runner_label)) +
+  ggplot(aes(x = finish_hour, y = hour_rank, colour = gender)) +
   geom_point(size = 3.5, alpha = 0.8) +
   # Use pre-defined colour palette
   scale_colour_manual(values = runner_colours) +
@@ -458,23 +457,15 @@ p_gender_final <- whwr_race_rankings %>%
     lineheight = 0.95
   ) +
   theme(axis.title.y = element_text(margin = margin(r = -100))) +
-  labs(subtitle = "",
-       x = " ",
-       y = "Number of runners")
+  labs(
+    subtitle = "",
+    x = " ",
+    y = "Number of runners"
+    )
 
 p_gender_final
 
 
-
-```
-
-As a very quick aside, I've never tried out `plotly` before, but I saw a tweet by Yan Holtz about it this week. There was a link to a short [demo](https://holtzy.github.io/data_analysis_website/) . I'm keen to know how easy it is to make an interactive version of the above chart with tool-tips (that's why I added the `text = runner_label` bit in the above chart).   
-
-I'll definitely play around a bit more with `plotly` in future weeks!  
-
-```{r gender_final_plotly, fig.asp = 0.5, fig.alt = "Ordered dot plot showing the number of runners who finished in each hour, by gender. Each dot represents one runner. The dots are ordered according to the runner's finishing position within each hour, with those who finished first shown at the bottom of each dotted bar."}
-
-ggplotly(p_gender_final, tooltip="text")
 
 ```
 
@@ -521,9 +512,11 @@ p_age_final <- whwr_race_rankings %>%
     lineheight = 0.95
   ) +
   theme(axis.title.y = element_text(margin = margin(r = -73))) +
-  labs(subtitle = "",
-       x = "Finish time (hours)",
-       y = "Age of runner")
+  labs(
+    subtitle = "",
+    x = "Finish time (hours)",
+    y = "Age of runner"
+    )
 
 p_age_final
 

@@ -1,11 +1,11 @@
 ## Ultra Trail Running
-The data this week was taken from the [International Trail Running Association (ITRA) website](https://itra.run/Races/FindRaceResults) and was made available to #TidyTuesday via [Benjamin Nowak](https://twitter.com/BjnNowak). The dataset provides a compilation of results from races that took place between 2012 - 2021 and focuses on 100 mile races (give or take a few miles). 
+The data this week was taken from the [International Trail Running Association (ITRA) website](https://itra.run/Races/FindRaceResults) and was made available to #TidyTuesday via [Benjamin Nowak](https://twitter.com/BjnNowak). The dataset provides a compilation of results from trail races that took place between 2012 - 2021 and focuses on 100 mile races (give or take a few miles). 
 
 
 ### Objectives
-This week I'm going to focus on [The West Highland Way Race](https://westhighlandwayrace.org/); a 95 mile race from Milngavie (just north of Glasgow) to Fort William in the Scottish Highlands. It's one of the world’s longest established ultra-marathons and first took place in 1985. I chose this race because the start line is just a few miles from where I live and I'd like to know more about it.   
+This week I'm going to focus on [The West Highland Way Race](https://westhighlandwayrace.org/); a 95 mile race from Milngavie (just north of Glasgow) to Fort William in the Scottish Highlands. It's one of the world’s longest established ultra-marathons and first took place in 1985. I chose this race because the start line is just a few miles from where I live.   
 
-Due to the COVID-19 pandemic, the race was cancelled in 2020 and 2021, so I'm going to look at the most recent data available (2019). My objective is to visualise the distribution of finish times (in hours) by gender and age.
+Due to the COVID-19 pandemic, the race was cancelled in 2020 and 2021, so I'm going to look at the most recent data available (2019). My objective is to visualise the distribution of finish times (in hours).
 
 
 ### Learning Points
@@ -30,7 +30,6 @@ library(sysfonts)
 library(ggtext)
 library(patchwork)
 library(magick)
-library(plotly)
 library(sf)
 library(rnaturalearth)
 library(tidyverse)
@@ -48,7 +47,7 @@ race <- readr::read_csv(
   )
 
 # For the ranking data, use Benjamin's link so that time values above 24hrs are not lost
-# (reading time as an character string)
+# (reading time as a character string)
 rankings <- readr::read_csv(
   "https://raw.githubusercontent.com/BjnNowak/UltraTrailRunning/main/ranking.csv",
   col_types = list(Time = "c")
@@ -365,7 +364,7 @@ whwr_race_rankings %>%
 
 <img src="README_files/figure-html/age_chart_2-1.png" title="Ordered dot plot showing the number of runners who finished in each hour, by age group. Each dot represents one runner. The dots are ordered according to the runner's finishing position within each hour, with those who finished first shown at the bottom of each dotted bar." alt="Ordered dot plot showing the number of runners who finished in each hour, by age group. Each dot represents one runner. The dots are ordered according to the runner's finishing position within each hour, with those who finished first shown at the bottom of each dotted bar." width="100%" style="display: block; margin: auto;" />
 
-In the end, I decided it would be more useful to retain the gender groupings and plot the finish hour data against the runner's age (a more conventional scatter plot). This makes it easier to see the age range of runners who finished in each hour. It has the added benefit of retaining the runner's gender information. Placed along side the gender chart I created above, I think this tells a more interesting story about the runners who finished in each hour. For example, you can see that everyone who finished by hour 24 was under 60 years of age.  
+In the end, I decided it would be more useful to retain the gender groupings and plot the finish hour data against the runner's age (a more conventional strip plot). This makes it easier to see the age range of runners who finished in each hour. It has the added benefit of retaining the runner's gender information. Placed along side the gender chart created above, I think this tells a more interesting story about the runners who finished in each hour. For example, you can see that everyone who finished by hour 24 was under 60 years of age.  
 
 
 ```r
@@ -466,7 +465,7 @@ Create the final chart showing the number of runners who finished in each hour, 
 
 ```r
 p_gender_final <- whwr_race_rankings %>% 
-  ggplot(aes(x = finish_hour, y = hour_rank, colour = gender, text = runner_label)) +
+  ggplot(aes(x = finish_hour, y = hour_rank, colour = gender)) +
   geom_point(size = 3.5, alpha = 0.8) +
   # Use pre-defined colour palette
   scale_colour_manual(values = runner_colours) +
@@ -484,28 +483,16 @@ p_gender_final <- whwr_race_rankings %>%
     lineheight = 0.95
   ) +
   theme(axis.title.y = element_text(margin = margin(r = -100))) +
-  labs(subtitle = "",
-       x = " ",
-       y = "Number of runners")
+  labs(
+    subtitle = "",
+    x = " ",
+    y = "Number of runners"
+    )
 
 p_gender_final
 ```
 
 <img src="README_files/figure-html/gender_final-1.png" title="Ordered dot plot showing the number of runners who finished in each hour, by gender. Each dot represents one runner. The dots are ordered according to the runner's finishing position within each hour, with those who finished first shown at the bottom of each dotted bar." alt="Ordered dot plot showing the number of runners who finished in each hour, by gender. Each dot represents one runner. The dots are ordered according to the runner's finishing position within each hour, with those who finished first shown at the bottom of each dotted bar." width="100%" style="display: block; margin: auto;" />
-
-As a very quick aside, I've never tried out `plotly` before, but I saw a tweet by Yan Holtz about it this week. There was a link to a short [demo](https://holtzy.github.io/data_analysis_website/) . I'm keen to know how easy it is to make an interactive version of the above chart with tool-tips (that's why I added the `text = runner_label` bit in the above chart).   
-
-I'll definitely play around a bit more with `plotly` in future weeks!  
-
-
-```r
-ggplotly(p_gender_final, tooltip="text")
-```
-
-```{=html}
-<div id="htmlwidget-55215ee3760fa64c81fb" style="width:100%;height:576px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-55215ee3760fa64c81fb">{"x":{"data":[{"x":[15,16,16,17,17,17,18,18,18,18,18,18,18,18,19,19,19,19,19,19,19,19,19,19,20,20,20,20,20,20,21,21,21,21,21,21,21,21,21,21,21,21,21,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,23,23,23,23,23,23,23,23,23,24,24,24,24,24,24,24,25,25,25,25,25,25,25,25,25,25,25,26,26,26,26,26,26,26,26,26,27,27,27,27,27,27,27,27,27,27,28,28,28,28,28,28,29,29,29,29,29,29,29,29,29,30,30,30,30,30,30,31,31,31,31,31,31,31,31,31,31,31,32,32,32,32,32,32,33,33,33,34,34,34],"y":[1,1,2,1,2,4,1,2,3,4,5,6,8,9,1,2,3,4,5,6,7,8,9,10,1,2,3,4,6,7,1,2,3,4,5,6,7,8,9,10,11,12,13,1,2,3,4,5,6,7,9,10,11,12,13,15,16,17,18,19,20,21,22,1,3,4,6,7,8,9,10,11,1,2,3,4,5,7,8,1,2,3,4,5,6,7,8,9,10,12,1,2,3,4,5,7,8,9,11,1,2,3,4,5,6,7,8,10,14,1,4,8,9,10,11,2,3,5,6,7,10,11,12,13,1,2,4,5,7,9,2,3,4,5,6,7,8,9,11,12,14,1,2,3,6,7,8,1,3,4,2,4,5],"text":["man<br />15h 14m 42s<br />Overall position: 1","man<br />16h 9m 4s<br />Overall position: 2","man<br />16h 42m 18s<br />Overall position: 3","man<br />17h 33m 35s<br />Overall position: 4","man<br />17h 36m 14s<br />Overall position: 5","man<br />17h 53m 50s<br />Overall position: 7","man<br />18h 4m 11s<br />Overall position: 8","man<br />18h 12m 17s<br />Overall position: 9","man<br />18h 28m 43s<br />Overall position: 10","man<br />18h 29m 16s<br />Overall position: 11","man<br />18h 44m 40s<br />Overall position: 12","man<br />18h 44m 44s<br />Overall position: 13","man<br />18h 53m 41s<br />Overall position: 15","man<br />18h 56m 28s<br />Overall position: 16","man<br />19h 7m 59s<br />Overall position: 17","man<br />19h 9m 43s<br />Overall position: 18","man<br />19h 15m 50s<br />Overall position: 19","man<br />19h 30m 21s<br />Overall position: 20","man<br />19h 37m 24s<br />Overall position: 21","man<br />19h 48m 51s<br />Overall position: 22","man<br />19h 48m 56s<br />Overall position: 23","man<br />19h 52m 52s<br />Overall position: 24","man<br />19h 52m 58s<br />Overall position: 25","man<br />19h 55m 57s<br />Overall position: 26","man<br />20h 17m 31s<br />Overall position: 27","man<br />20h 32m 9s<br />Overall position: 28","man<br />20h 36m 30s<br />Overall position: 29","man<br />20h 37m 54s<br />Overall position: 30","man<br />20h 54m 46s<br />Overall position: 32","man<br />20h 59m 27s<br />Overall position: 33","man<br />21h 2m 38s<br />Overall position: 34","man<br />21h 9m 41s<br />Overall position: 35","man<br />21h 12m 11s<br />Overall position: 36","man<br />21h 13m 17s<br />Overall position: 37","man<br />21h 16m 50s<br />Overall position: 38","man<br />21h 20m 21s<br />Overall position: 39","man<br />21h 28m 43s<br />Overall position: 40","man<br />21h 39m 13s<br />Overall position: 41","man<br />21h 43m 31s<br />Overall position: 42","man<br />21h 48m 55s<br />Overall position: 43","man<br />21h 52m 16s<br />Overall position: 44","man<br />21h 54m 52s<br />Overall position: 45","man<br />21h 57m 19s<br />Overall position: 46","man<br />22h 1m 45s<br />Overall position: 48","man<br />22h 1m 47s<br />Overall position: 49","man<br />22h 2m 27s<br />Overall position: 50","man<br />22h 7m 33s<br />Overall position: 51","man<br />22h 13m 5s<br />Overall position: 52","man<br />22h 13m 43s<br />Overall position: 53","man<br />22h 15m 11s<br />Overall position: 54","man<br />22h 17m 30s<br />Overall position: 56","man<br />22h 18m 30s<br />Overall position: 57","man<br />22h 24m 35s<br />Overall position: 58","man<br />22h 32m 57s<br />Overall position: 59","man<br />22h 33m 50s<br />Overall position: 60","man<br />22h 42m 35s<br />Overall position: 62","man<br />22h 42m 43s<br />Overall position: 63","man<br />22h 44m 48s<br />Overall position: 64","man<br />22h 45m 18s<br />Overall position: 65","man<br />22h 45m 46s<br />Overall position: 66","man<br />22h 46m 23s<br />Overall position: 67","man<br />22h 46m 33s<br />Overall position: 68","man<br />22h 47m 37s<br />Overall position: 69","man<br />23h 0m 25s<br />Overall position: 71","man<br />23h 3m 20s<br />Overall position: 73","man<br />23h 5m 17s<br />Overall position: 74","man<br />23h 16m 29s<br />Overall position: 76","man<br />23h 19m 35s<br />Overall position: 77","man<br />23h 22m 39s<br />Overall position: 78","man<br />23h 48m 4s<br />Overall position: 79","man<br />23h 50m 10s<br />Overall position: 80","man<br />23h 50m 55s<br />Overall position: 81","man<br />24h 16m 0s<br />Overall position: 82","man<br />24h 16m 35s<br />Overall position: 83","man<br />24h 21m 43s<br />Overall position: 84","man<br />24h 24m 10s<br />Overall position: 85","man<br />24h 32m 39s<br />Overall position: 86","man<br />24h 52m 8s<br />Overall position: 88","man<br />24h 55m 7s<br />Overall position: 89","man<br />25h 0m 3s<br />Overall position: 92","man<br />25h 11m 25s<br />Overall position: 93","man<br />25h 11m 39s<br />Overall position: 94","man<br />25h 17m 17s<br />Overall position: 95","man<br />25h 24m 56s<br />Overall position: 96","man<br />25h 38m 32s<br />Overall position: 97","man<br />25h 38m 55s<br />Overall position: 98","man<br />25h 42m 20s<br />Overall position: 99","man<br />25h 50m 0s<br />Overall position: 100","man<br />25h 51m 40s<br />Overall position: 101","man<br />25h 56m 54s<br />Overall position: 103","man<br />26h 3m 59s<br />Overall position: 105","man<br />26h 7m 17s<br />Overall position: 106","man<br />26h 8m 50s<br />Overall position: 107","man<br />26h 11m 58s<br />Overall position: 108","man<br />26h 12m 13s<br />Overall position: 109","man<br />26h 31m 1s<br />Overall position: 111","man<br />26h 35m 38s<br />Overall position: 112","man<br />26h 36m 27s<br />Overall position: 113","man<br />26h 44m 47s<br />Overall position: 115","man<br />27h 10m 20s<br />Overall position: 118","man<br />27h 18m 6s<br />Overall position: 119","man<br />27h 28m 54s<br />Overall position: 120","man<br />27h 30m 46s<br />Overall position: 121","man<br />27h 31m 37s<br />Overall position: 122","man<br />27h 35m 17s<br />Overall position: 123","man<br />27h 38m 43s<br />Overall position: 124","man<br />27h 41m 15s<br />Overall position: 125","man<br />27h 41m 29s<br />Overall position: 127","man<br />27h 49m 43s<br />Overall position: 131","man<br />28h 1m 46s<br />Overall position: 132","man<br />28h 9m 54s<br />Overall position: 135","man<br />28h 38m 35s<br />Overall position: 139","man<br />28h 48m 38s<br />Overall position: 140","man<br />28h 50m 57s<br />Overall position: 141","man<br />28h 55m 11s<br />Overall position: 142","man<br />29h 13m 41s<br />Overall position: 145","man<br />29h 18m 0s<br />Overall position: 146","man<br />29h 19m 28s<br />Overall position: 148","man<br />29h 20m 35s<br />Overall position: 149","man<br />29h 26m 49s<br />Overall position: 150","man<br />29h 42m 48s<br />Overall position: 153","man<br />29h 45m 36s<br />Overall position: 154","man<br />29h 48m 44s<br />Overall position: 155","man<br />29h 52m 18s<br />Overall position: 156","man<br />30h 7m 35s<br />Overall position: 157","man<br />30h 12m 49s<br />Overall position: 158","man<br />30h 26m 21s<br />Overall position: 160","man<br />30h 32m 56s<br />Overall position: 161","man<br />30h 36m 44s<br />Overall position: 163","man<br />30h 48m 21s<br />Overall position: 165","man<br />31h 12m 56s<br />Overall position: 167","man<br />31h 15m 49s<br />Overall position: 168","man<br />31h 23m 0s<br />Overall position: 169","man<br />31h 26m 1s<br />Overall position: 170","man<br />31h 27m 41s<br />Overall position: 171","man<br />31h 40m 52s<br />Overall position: 172","man<br />31h 41m 17s<br />Overall position: 173","man<br />31h 44m 7s<br />Overall position: 174","man<br />31h 49m 12s<br />Overall position: 176","man<br />31h 51m 43s<br />Overall position: 177","man<br />31h 58m 16s<br />Overall position: 179","man<br />32h 16m 47s<br />Overall position: 180","man<br />32h 24m 17s<br />Overall position: 181","man<br />32h 28m 31s<br />Overall position: 182","man<br />32h 39m 52s<br />Overall position: 185","man<br />32h 40m 20s<br />Overall position: 186","man<br />32h 42m 13s<br />Overall position: 187","man<br />33h 27m 56s<br />Overall position: 188","man<br />33h 32m 6s<br />Overall position: 190","man<br />33h 46m 43s<br />Overall position: 191","man<br />34h 7m 42s<br />Overall position: 193","man<br />34h 21m 3s<br />Overall position: 195","man<br />34h 27m 51s<br />Overall position: 196"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(50,97,106,1)","opacity":0.8,"size":13.2283464566929,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(50,97,106,1)"}},"hoveron":"points","name":"Man","legendgroup":"Man","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,18,20,21,22,22,22,23,23,24,24,24,25,25,26,26,26,26,27,27,27,27,28,28,28,28,28,28,29,29,29,29,30,30,30,31,31,31,32,32,33,34,34],"y":[3,7,5,14,8,14,23,2,5,6,9,10,11,13,6,10,12,13,9,11,12,13,2,3,5,6,7,12,1,4,8,9,3,6,8,1,10,13,4,5,2,1,3],"text":["woman<br />17h 41m 9s<br />Overall position: 6","woman<br />18h 48m 35s<br />Overall position: 14","woman<br />20h 54m 43s<br />Overall position: 31","woman<br />21h 59m 51s<br />Overall position: 47","woman<br />22h 15m 58s<br />Overall position: 55","woman<br />22h 35m 6s<br />Overall position: 61","woman<br />22h 57m 2s<br />Overall position: 70","woman<br />23h 2m 27s<br />Overall position: 72","woman<br />23h 13m 27s<br />Overall position: 75","woman<br />24h 48m 25s<br />Overall position: 87","woman<br />24h 55m 27s<br />Overall position: 90","woman<br />24h 58m 46s<br />Overall position: 91","woman<br />25h 55m 19s<br />Overall position: 102","woman<br />25h 58m 20s<br />Overall position: 104","woman<br />26h 19m 25s<br />Overall position: 110","woman<br />26h 44m 43s<br />Overall position: 114","woman<br />26h 44m 57s<br />Overall position: 116","woman<br />26h 47m 38s<br />Overall position: 117","woman<br />27h 41m 19s<br />Overall position: 126","woman<br />27h 43m 42s<br />Overall position: 128","woman<br />27h 44m 50s<br />Overall position: 129","woman<br />27h 46m 59s<br />Overall position: 130","woman<br />28h 6m 33s<br />Overall position: 133","woman<br />28h 9m 12s<br />Overall position: 134","woman<br />28h 22m 7s<br />Overall position: 136","woman<br />28h 24m 43s<br />Overall position: 137","woman<br />28h 26m 9s<br />Overall position: 138","woman<br />28h 59m 31s<br />Overall position: 143","woman<br />29h 10m 15s<br />Overall position: 144","woman<br />29h 19m 0s<br />Overall position: 147","woman<br />29h 29m 17s<br />Overall position: 151","woman<br />29h 34m 7s<br />Overall position: 152","woman<br />30h 20m 57s<br />Overall position: 159","woman<br />30h 35m 12s<br />Overall position: 162","woman<br />30h 47m 19s<br />Overall position: 164","woman<br />31h 10m 44s<br />Overall position: 166","woman<br />31h 45m 3s<br />Overall position: 175","woman<br />31h 58m 2s<br />Overall position: 178","woman<br />32h 35m 8s<br />Overall position: 183","woman<br />32h 38m 43s<br />Overall position: 184","woman<br />33h 29m 20s<br />Overall position: 189","woman<br />34h 0m 17s<br />Overall position: 192","woman<br />34h 15m 42s<br />Overall position: 194"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(224,101,8,1)","opacity":0.8,"size":13.2283464566929,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(224,101,8,1)"}},"hoveron":"points","name":"Woman","legendgroup":"Woman","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"name":"Man","legendgroup":"Man","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"name":"Woman","legendgroup":"Woman","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.6268161062682,"r":5.31340805313408,"b":46.1602324616023,"l":160.398505603985},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(77,77,77,1)","family":"Lato","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[12.475,35.025],"tickmode":"array","ticktext":["15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34"],"tickvals":[15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34],"categoryorder":"array","categoryarray":["15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Lato","size":15.9402241594022},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":" ","font":{"color":"rgba(77,77,77,1)","family":"Lato","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.235,26.935],"tickmode":"array","ticktext":["5","10","15","20","25"],"tickvals":[5,10,15,20,25],"categoryorder":"array","categoryarray":["5","10","15","20","25"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Lato","size":15.9402241594022},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Number of runners","font":{"color":"rgba(77,77,77,1)","family":"Lato","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(77,77,77,1)","family":"Lato","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"10c433024710":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"10c4248e6e6e":{"x":{},"y":{},"colour":{},"text":{},"label":{}}},"cur_data":"10c433024710","visdat":{"10c433024710":["function (y) ","x"],"10c4248e6e6e":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-```
 
 Create the final chart showing finishing hour versus the runner's age, by gender.  
 
@@ -550,9 +537,11 @@ p_age_final <- whwr_race_rankings %>%
     lineheight = 0.95
   ) +
   theme(axis.title.y = element_text(margin = margin(r = -73))) +
-  labs(subtitle = "",
-       x = "Finish time (hours)",
-       y = "Age of runner")
+  labs(
+    subtitle = "",
+    x = "Finish time (hours)",
+    y = "Age of runner"
+    )
 
 p_age_final
 ```
@@ -722,41 +711,40 @@ sessionInfo()
 ## other attached packages:
 ##  [1] forcats_0.5.1       stringr_1.4.0       dplyr_1.0.7        
 ##  [4] purrr_0.3.4         readr_2.0.2         tidyr_1.1.4        
-##  [7] tibble_3.1.5        tidyverse_1.3.1     rnaturalearth_0.1.0
-## [10] sf_1.0-3            plotly_4.10.0       ggplot2_3.3.5      
-## [13] magick_2.7.3        patchwork_1.1.1     ggtext_0.1.1       
-## [16] showtext_0.9-4      showtextdb_3.0      sysfonts_0.8.5     
+##  [7] tibble_3.1.5        ggplot2_3.3.5       tidyverse_1.3.1    
+## [10] rnaturalearth_0.1.0 sf_1.0-3            magick_2.7.3       
+## [13] patchwork_1.1.1     ggtext_0.1.1        showtext_0.9-4     
+## [16] showtextdb_3.0      sysfonts_0.8.5     
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] fs_1.5.0                 lubridate_1.8.0          bit64_4.0.5             
 ##  [4] httr_1.4.2               tools_4.1.1              backports_1.2.1         
 ##  [7] bslib_0.3.1              utf8_1.2.2               R6_2.5.1                
 ## [10] KernSmooth_2.23-20       rgeos_0.5-8              DBI_1.1.1               
-## [13] lazyeval_0.2.2           colorspace_2.0-2         withr_2.4.2             
-## [16] sp_1.4-5                 tidyselect_1.1.1         bit_4.0.4               
-## [19] curl_4.3.2               compiler_4.1.1           textshaping_0.3.5       
-## [22] cli_3.0.1                rvest_1.0.1              xml2_1.3.2              
-## [25] labeling_0.4.2           sass_0.4.0               scales_1.1.1            
-## [28] classInt_0.4-3           proxy_0.4-26             systemfonts_1.0.2       
-## [31] digest_0.6.28            rmarkdown_2.11           pkgconfig_2.0.3         
-## [34] htmltools_0.5.2          highr_0.9                dbplyr_2.1.1            
-## [37] fastmap_1.1.0            htmlwidgets_1.5.4        rlang_0.4.11            
-## [40] readxl_1.3.1             rstudioapi_0.13          farver_2.1.0            
-## [43] jquerylib_0.1.4          generics_0.1.0           jsonlite_1.7.2          
-## [46] crosstalk_1.1.1          vroom_1.5.5              magrittr_2.0.1          
-## [49] s2_1.0.7                 Rcpp_1.0.7               munsell_0.5.0           
-## [52] fansi_0.5.0              lifecycle_1.0.1          stringi_1.7.5           
-## [55] yaml_2.2.1               snakecase_0.11.0         grid_4.1.1              
-## [58] parallel_4.1.1           crayon_1.4.1             lattice_0.20-45         
-## [61] haven_2.4.3              gridtext_0.1.4           hms_1.1.1               
-## [64] knitr_1.36               pillar_1.6.3             markdown_1.1            
-## [67] wk_0.5.0                 reprex_2.0.1             glue_1.4.2              
-## [70] evaluate_0.14            data.table_1.14.2        modelr_0.1.8            
-## [73] vctrs_0.3.8              tzdb_0.1.2               cellranger_1.1.0        
-## [76] gtable_0.3.0             assertthat_0.2.1         xfun_0.26               
-## [79] janitor_2.1.0            broom_0.7.9              e1071_1.7-9             
-## [82] rnaturalearthhires_0.2.0 ragg_1.1.3               class_7.3-19            
-## [85] viridisLite_0.4.0        units_0.7-2              ellipsis_0.3.2
+## [13] colorspace_2.0-2         withr_2.4.2              sp_1.4-5                
+## [16] tidyselect_1.1.1         bit_4.0.4                curl_4.3.2              
+## [19] compiler_4.1.1           textshaping_0.3.5        cli_3.0.1               
+## [22] rvest_1.0.1              xml2_1.3.2               labeling_0.4.2          
+## [25] sass_0.4.0               scales_1.1.1             classInt_0.4-3          
+## [28] proxy_0.4-26             systemfonts_1.0.2        digest_0.6.28           
+## [31] rmarkdown_2.11           pkgconfig_2.0.3          htmltools_0.5.2         
+## [34] dbplyr_2.1.1             fastmap_1.1.0            highr_0.9               
+## [37] rlang_0.4.11             readxl_1.3.1             rstudioapi_0.13         
+## [40] jquerylib_0.1.4          generics_0.1.0           farver_2.1.0            
+## [43] jsonlite_1.7.2           vroom_1.5.5              magrittr_2.0.1          
+## [46] s2_1.0.7                 Rcpp_1.0.7               munsell_0.5.0           
+## [49] fansi_0.5.0              lifecycle_1.0.1          stringi_1.7.5           
+## [52] yaml_2.2.1               snakecase_0.11.0         grid_4.1.1              
+## [55] parallel_4.1.1           crayon_1.4.1             lattice_0.20-45         
+## [58] haven_2.4.3              gridtext_0.1.4           hms_1.1.1               
+## [61] knitr_1.36               pillar_1.6.3             markdown_1.1            
+## [64] wk_0.5.0                 reprex_2.0.1             glue_1.4.2              
+## [67] evaluate_0.14            modelr_0.1.8             vctrs_0.3.8             
+## [70] tzdb_0.1.2               cellranger_1.1.0         gtable_0.3.0            
+## [73] assertthat_0.2.1         xfun_0.26                janitor_2.1.0           
+## [76] broom_0.7.9              e1071_1.7-9              rnaturalearthhires_0.2.0
+## [79] ragg_1.1.3               class_7.3-19             units_0.7-2             
+## [82] ellipsis_0.3.2
 ```
 
 
