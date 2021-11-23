@@ -249,7 +249,7 @@ ggplot(data = afripop_2020_df) +
   coord_fixed()
 ```
 
-<img src="README_files/figure-html/first_map-1.png" title="Image showing population density map for Africa for the year 2020 (rough draft without any special formatting." alt="Image showing population density map for Africa for the year 2020 (rough draft without any special formatting." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/first_map-1.png" title="Image showing population density map for Africa for the year 2020 (rough draft without any special formatting)." alt="Image showing population density map for Africa for the year 2020 (rough draft without any special formatting)." width="100%" style="display: block; margin: auto;" />
 
 Looking at the initial map above, it occurs to me that Africa seems more densely populated around its coastline, lakes, rivers. I'd like to be able to see this more clearly by showing the main rivers on the map. The `afrilearndata` package doesn't have data for African rivers, but I know the `rnaturalearth` package has river information for the whole world (I saw this a few weeks ago in a tutorial called [Mapping Geographic Data in R, with ggplot2](https://flowingdata.com/mapping-in-r-ggplot2/) on the Flowing Data website.)  
 
@@ -262,7 +262,7 @@ rivers <- ne_download(scale = 10, type = "rivers_lake_centerlines", category = "
 
 ```
 ## OGR data source with driver: ESRI Shapefile 
-## Source: "C:\Users\FiLee\AppData\Local\Temp\Rtmpm891Da", layer: "ne_10m_rivers_lake_centerlines"
+## Source: "C:\Users\FiLee\AppData\Local\Temp\RtmpoJY0IU", layer: "ne_10m_rivers_lake_centerlines"
 ## with 1455 features
 ## It has 34 fields
 ## Integer64 fields read as strings:  rivernum ne_id
@@ -278,7 +278,7 @@ ggplot(data = afripop_2020_df) +
   coord_sf(xlim = c(-17.62625, 51.20708), ylim = c(-34.97542, 37.35792))
 ```
 
-<img src="README_files/figure-html/first_map_with_rivers-1.png" title="Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting." alt="Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/first_map_with_rivers-1.png" title="Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting)." alt="Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting)." width="100%" style="display: block; margin: auto;" />
 
 
 ### Visualise Data
@@ -353,7 +353,7 @@ p_map_2000 <- p_map_base +
 p_map_2000
 ```
 
-<img src="README_files/figure-html/2000_map-1.png" title="Image showing population density map for Africa for the year 2000." alt="Image showing population density map for Africa for the year 2000." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/2000_map-1.png" title="Image showing population density map for Africa for the year 2000. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib)." alt="Image showing population density map for Africa for the year 2000. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib)." width="100%" style="display: block; margin: auto;" />
 
 Using the base plot created above, swap the 2000 data for the 2020 data and create a map for 2020.
 
@@ -368,7 +368,7 @@ p_map_2020 <- p_map_base %+% afripop_2020_df +
 p_map_2020
 ```
 
-<img src="README_files/figure-html/2020_map-1.png" title="Image showing population density map for Africa for the year 2020." alt="Image showing population density map for Africa for the year 2020." width="100%" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/2020_map-1.png" title="Image showing population density map for Africa for the year 2020. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib). Population density in Africa increased between 2000 and 2020, especially around the Niger and Nile rivers and Lake Victoria." alt="Image showing population density map for Africa for the year 2020. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib). Population density in Africa increased between 2000 and 2020, especially around the Niger and Nile rivers and Lake Victoria." width="100%" style="display: block; margin: auto;" />
 
 Save both maps as images.  
 

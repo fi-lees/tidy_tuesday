@@ -188,7 +188,7 @@ afripop_2020_df <- afripop_2020_df %>%
 
 Just to get a sense of what the population density looks like, I'll draw a very quick plot of the 2020 data with no special formatting / labelling (oh, those default colours are hurting my eyes!)
 
-```{r first_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020 (rough draft without any special formatting."}
+```{r first_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020 (rough draft without any special formatting)."}
 
 ggplot(data = afripop_2020_df) +
   # geom_raster plots the raster data, but you could also use geom_tile
@@ -207,7 +207,7 @@ rivers <- ne_download(scale = 10, type = "rivers_lake_centerlines", category = "
 
 ```
 
-```{r first_map_with_rivers, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting."}
+```{r first_map_with_rivers, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting)."}
 
 ggplot(data = afripop_2020_df) +
   geom_raster(aes(x, y, fill = population_2)) +
@@ -252,7 +252,7 @@ I'm going to call the palette directly when I draw the maps, but by reading the 
 
 Now to build the map for the year 2000.
 
-```{r 2000_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2000."}
+```{r 2000_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2000. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib)."}
 
 # Build a base plot
 p_map_base <- ggplot(data = afripop_2000_df) +
@@ -290,7 +290,7 @@ p_map_2000
 
 Using the base plot created above, swap the 2000 data for the 2020 data and create a map for 2020.
 
-```{r 2020_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020."}
+```{r 2020_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib). Population density in Africa increased between 2000 and 2020, especially around the Niger and Nile rivers and Lake Victoria."}
 
 # Update base plot with 2020 data and add year 2020 label
 p_map_2020 <- p_map_base %+% afripop_2020_df +
