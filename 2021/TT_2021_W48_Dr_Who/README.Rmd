@@ -1,0 +1,402 @@
+---
+title: "Tidy Tuesday: 2021, Week 48, Dr Who"
+author: "Fiona Lees"
+date: 2021-12-06
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.width = 10, 
+                      fig.asp = 0.618, 
+                      out.width = "100%",
+                      fig.align = "center")
+
+```
+
+## Dr Who
+The data this week is provided via the [`datardis` package](https://randomics.netlify.app/posts/2021-11-16-datardis/), with supplementary data from IMDb. There are four tables of data relating to Doctor Who episodes, directors, writers and IMDb ratings (new era only).  
+
+
+### Objectives
+This week I'm going to focus on the `episodes` data and look at the relationship between UK viewing figures (in the millions) and audience ratings (Audience Appreciation Index, ranging from 0 to 100). I'm curious to know if the Christmas special episodes look different from normal episodes.  
+
+
+### Learning Points
+The main things I learned about this week were:  
+
+- **Annotations:** How to add annotation text / lines to an individual facet.  
+
+- **Theme styling:** I spent a bit of time trying to style my chart with a Doctor Who-ish theme (with a small nod to Xmas).       
+
+### Load Packages
+Load the required packages.  
+
+```{r packages}
+
+library(lubridate)
+library(patchwork)
+library(showtext)
+library(tidyverse)
+
+```
+
+
+### Import Data
+I'm only going to use the `episodes` data. I could have loaded the `datardis` package and accessed the data that way, but I'm choosing to read it in from the TidyTuesday GitHub page.  
+
+```{r import_data}
+
+episodes <- readr::read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-11-23/episodes.csv"
+  )
+
+```
+
+Let's have a quick look at the data.  
+
+```{r summary}
+
+view(episodes)
+
+# Trying out Hmisc::describe() to summarise the data
+Hmisc::describe(episodes)
+
+```
+
+
+### Explore /  Wrangle Data
+
+First, I'd like to know a bit more about the special episodes.  
+
+```{r explore_specials}
+
+# Q. Are special episodes part of the official seasons? 
+# A. Not always (some have no season_number) 
+#    Some seasons have no specials, while some seasons have more than one
+#    All specials that are part of a season fall on either Xmas or NY day,
+#    but this isn't always the case for specials that aren't part of a season
+episodes %>%
+  filter(type == "special") %>% 
+  select(season_number, episode_number:first_aired, uk_viewers:duration) %>% 
+  arrange(season_number)
+
+# Q. Are all Xmas episodes special? 
+# A. Yes
+episodes %>%
+  filter((day(first_aired) == 25 & month(first_aired) == 12) & type != "special") 
+
+# Q. Are all New Year's day episodes special? 
+# A. No, one of them isn't - the first episode of season 12
+episodes %>%
+  filter((day(first_aired) == 1 & month(first_aired) == 1) & type != "special") %>% 
+  select(season_number, episode_number:first_aired, uk_viewers:duration)
+
+```
+
+Having had a quick eye-ball of the data, I'm going to clear out the data I'm not interested in and create some new variables.  
+
+```{r make_new_variables}
+
+# Tidy-up the episodes table and create new variables
+episodes_new <- episodes %>% 
+  select(-era, -serial_title, -story_number, -production_code) %>% 
+  # Only keep episodes / specials that are part of a season, 
+  # but exclude those that are part of season 13 (it's still ongoing) 
+  filter(!is.na(season_number) & season_number < 13) %>% 
+  # Add a unique episode_id (ordered by when episode was first aired)
+  arrange(first_aired) %>% 
+  mutate(episode_id = row_number(), .before = season_number) %>% 
+  # Add variable to flag special, first and other episodes  
+  mutate(type_new = as_factor(case_when(
+    type == "special" ~ "Christmas special",
+    episode_number == 1 ~ "First episode",
+    TRUE ~ "Other episode"
+    )), .after = type)
+
+```
+
+Now I'm going to create an overall and a per season summary table, with mean viewers and ratings, grouped by episodes and specials.  
+
+```{r make_summaries}
+
+# Overall summary
+summary_overall <- episodes_new %>% 
+  group_by(type) %>% 
+  summarise(
+    n_episodes = n(),
+    mean_viewers = mean(uk_viewers),
+    mean_rating = mean(rating)
+  ) %>% 
+  ungroup()
+
+# Per season summary
+summary_season <- episodes_new %>% 
+  group_by(season_number, type) %>% 
+  summarise(
+    n_episodes = n(),
+    mean_viewers = mean(uk_viewers),
+    mean_rating = mean(rating),
+  ) %>% 
+  ungroup()
+
+```
+
+I'd like to get an overall sense of the peaks and troughs in viewers and ratings, so I'll create a quick plot to show the trend over time (highlighting first and special episodes).  I'll add a line showing the overall mean for viewers and ratings (excluding special episodes).  
+
+```{r chart_1, fig.width = 15, fig.asp = 0.8, fig.alt = "Two line charts showing: (1) the number of people who viewed each episode of Doctor Who (millions); (2) the rating each episode received (Audience Appreciation Index 0 - 100). First and special episodes are highlighted."}
+
+# Some initial formatting to make the charts easier to read
+theme_set(theme_bw()) 
+theme_update(
+  legend.position = "top",
+  legend.justification = "left"
+  )
+episode_type_colours = c("red", "grey", "goldenrod2")
+
+# Viewers chart
+p_viewers_1 <- episodes_new %>% 
+  ggplot(aes(x = episode_id, y = uk_viewers)) +
+  geom_line(colour = "darkgrey", size = 0.5) +
+  # Highlight first and special episodes 
+  geom_point(aes(colour = type_new), size = 3) +
+  scale_colour_manual(values = episode_type_colours) +
+  # Add line showing overall mean for episodes (excluding specials)
+  geom_hline(data = filter(summary_overall, type == "episode"), 
+             aes(yintercept = mean_viewers), 
+             linetype = "dashed"
+             ) +
+  annotate("text", 157, 7.8, label = "Mean\n(excluding specials)", size = 3.5) +
+  labs(title = "Dr Who: Number of people who viewed each episode (millions)",
+       colour = ""
+       )
+  
+# Ratings chart
+p_ratings_1 <- episodes_new %>% 
+  ggplot(aes(x = episode_id, y = rating)) +
+  geom_line(colour = "darkgrey", size = 0.5) +
+  geom_point(aes(colour = type_new), size = 3) +
+  scale_colour_manual(values = episode_type_colours) +
+  geom_hline(data = filter(summary_overall, type == "episode"), 
+             aes(yintercept = mean_rating), 
+             linetype = "dashed") +
+  annotate("text", 157, 85.3, label = "Mean\n(excluding specials)", size = 3.5) +
+  labs(title = "Dr Who: Rating each episode received (Audience Appreciation Index 0 - 100)",
+       colour = ""
+       )
+
+# Patchwork is loaded, so patch the charts together
+p_viewers_1 / 
+  p_ratings_1 + plot_layout(guides = "collect")
+
+```
+
+I can see  that season openers and specials generally draw higher numbers of viewers than average episodes, but this doesn't always correspond to higher ratings. In fact, the specials often don't rate very highly.  
+
+It also looks like some seasons performed better than others, so I'll take a closer look at how specials compare to other episodes within each season.  
+
+```{r chart_2, fig.width = 12, fig.asp = 0.8, fig.alt = "Two strip plots showing: (1) the number of people who viewed each episode of Doctor Who (millions) in each season; (2) the rating each episode received (Audience Appreciation Index 0 - 100) in each season. First and special episodes are highlighted."}
+
+# Viewers
+p_viewers_2 <- episodes_new %>% 
+  ggplot() +
+  geom_jitter(aes(x = factor(season_number), y = uk_viewers, colour = type_new),
+              width = 0.15, height = 0, size = 3, alpha = 0.6) +
+  scale_colour_manual(values = episode_type_colours) +
+  # Add mean for each season
+  geom_segment(data = filter(summary_season, type == "episode"), 
+               aes(x = season_number + 0.3, xend = season_number - 0.3, y = mean_viewers, yend = mean_viewers),
+               linetype = "dashed") +
+  labs(title = "Dr Who: Number of people who viewed each episode, by season (millions)",
+       subtitle = "Each dot represents one episode. Dashed line represents mean viewers each season (excluding specials).",
+       colour = "")
+    
+# Ratings
+p_ratings_2 <- episodes_new %>% 
+  ggplot() +
+  geom_jitter(aes(x = factor(season_number), y = rating, colour = type_new),
+              width = 0.15, height = 0, size = 3, alpha = 0.6) +
+  scale_colour_manual(values = episode_type_colours) +
+  # Add mean for each season
+  geom_segment(data = filter(summary_season, type == "episode"), 
+               aes(x = season_number + 0.3, xend = season_number - 0.3, y = mean_rating, yend = mean_rating),
+               linetype = "dashed") +
+  labs(title = "Dr Who: Rating each episode received, by season (Audience Appreciation Index 0 - 100)",
+       subtitle = "Each dot represents one episode. Dashed line represents mean rating each season (excluding specials).",
+       colour = "")         
+
+p_viewers_2 / 
+  p_ratings_2 + plot_layout(guides = "collect")
+
+```
+
+
+### Visualise Data
+It's clear from the charts above that special episodes do look a bit different to other episodes. For my final visualisation I'm going to use a scatter plot to show how each Christmas special compares to the other episodes within its own season. I think it's helpful to highlight the first episode in each season to provide some context.  
+
+My plan is to build a panel of scatter plots, one plot (facet) for each season, and then style it with Doctor Who-ish colours.  
+
+First, load the required fonts and then set-up the colours and theme.   
+
+```{r fonts}
+
+# Fonts
+showtext_auto(enable = TRUE)
+font_add_google("Lato")
+font_add_google("Playfair Display")
+
+```
+
+My colour inspiration was taken from the [Official 2022 Doctor Who Annual](https://cdn.waterstones.com/bookjackets/large/9781/4059/9781405948029.jpg).  
+
+```{r colours}
+
+# Colours
+episode_type_colours = c("#EFDE02", "#DE4046", "#FFFFFF")
+dr_who_blue_light = "#265773"
+dr_who_blue_mid = "#204860"
+dr_who_blue_dark = "#193A4D"
+
+
+```
+
+```{r theme}
+
+# Theme
+theme_set(theme_minimal())
+
+theme_update(
+  text = element_text(family = "Lato", size = 12, colour = dr_who_blue_dark),
+  plot.title = element_text(family = "Playfair Display", size = 18, face = "bold", margin = margin(b = 10)),
+  plot.subtitle = element_text(size = 12, margin = margin(b = 10), lineheight = 1.1),
+  plot.caption = element_text(size = 10, margin = margin(t = 10), hjust = 0, lineheight = 1.),
+  plot.background = element_rect(colour = NA, fill = "#FFFFFF"),
+  plot.margin = margin(rep(10, 10)),
+  strip.text = element_text(size = 12, colour = "#FFFFFF", face = "bold", hjust = 0.05),
+  strip.background = element_rect(fill = dr_who_blue_light, colour = "#FFFFFF"),
+  panel.background = element_rect(fill = dr_who_blue_light),
+  panel.border = element_rect(fill = NA, colour = "#FFFFFF"),
+  panel.grid.major = element_line(colour = dr_who_blue_mid, size = 0.5),
+  panel.grid.minor = element_blank(),
+  legend.position = "top",
+  legend.justification = "left",
+  legend.key = element_rect(fill = dr_who_blue_light, colour = dr_who_blue_light), 
+  legend.key.size = unit(0.3, "inch"),
+  legend.text = element_text(size = 12),
+  legend.title = element_text(size = 12),
+  axis.text = element_text(size = 12, colour = dr_who_blue_dark),
+  axis.title.y = element_text(margin = margin(r = 10)),
+  axis.title.x = element_text(margin = margin(t = 10, b = 10))
+  )
+
+```
+
+I'm going to use facet_wrap(~season_number) to create a scatter plot facet for each season. I'd like to add some annotation to the first facet (Season 1) to help guide the reader in how to read the chart. To do this I'll set-up a tibble for the annotation text and one for the annotation lines. By recording the season number in these tibbles along with the relevant x / y co-ordinates I can pass this into ggplot and use facet_wrap to facet not just the data, but the annotations text and lines too.  
+
+```{r annotation}
+
+# Annotation text
+annotation_text <- tibble(
+  x = c(73, 84.2),
+  y = c(13, 13),
+  label = c("High viewers\nLow rating", "Average"),
+  season_number = c(1, 1),
+)
+
+# Annotation lines
+annotation_line <- tibble(
+  x = c(84, 87.5),
+  xend = c(82.8, 87.5),
+  y = c(13, 12.3),
+  yend = c(13, 8.25),
+  season_number = c(1, 1),
+)
+
+# Labels for facet strips (1 = Season 1 etc)
+season_labels <- str_c("Season ", 1:12)
+names(season_labels) <- c(1:12)
+
+```
+
+Now, build the final plot.  
+
+```{r final_chart, fig.width = 12, fig.asp = 1, fig.alt = "Panel of scatter plots showing the rating received by each episode of Doctor Who when it first aired in the UK (Audience Appreciation Index 0 - 100), versus the number of people, in millions, who viewed it. Each scatter plot shows one season, with each dot representing one episode in that season. The first episode of each season and Christmas specials are highlighted. Dotted lines show the mean ratings and viewers for the season (excludes Chistmas episodes). Christmas specials tend to attract a large number of viewers, but they often rate below the season average."}
+
+p_final <- ggplot() +
+  # Mean lines
+  geom_vline(data = filter(summary_season, type == "episode"), 
+             aes(xintercept = mean_rating), linetype = "dashed", colour = "#FFFFFF", size = 0.5) +
+  geom_hline(data = filter(summary_season, type == "episode"), 
+             aes(yintercept = mean_viewers), linetype = "dashed", colour = "#FFFFFF", size = 0.5) +
+  # Points
+  geom_point(data = filter(episodes_new, type_new == "Other episode"), 
+             aes(y = uk_viewers, x = rating, colour = type_new), alpha = 0.6, size = 2.5) +
+  geom_point(data = filter(episodes_new, type_new != "Other episode"), 
+             aes(y = uk_viewers, x = rating, colour = type_new), size = 3) +
+  scale_colour_manual(values = episode_type_colours) +
+  # Annotation text
+  geom_label(data = annotation_text, 
+             aes(x = x, y = y, label = label),
+             colour = "#FFFFFF",
+             fill = dr_who_blue_light,
+             label.size = NA,
+             size = 3.88,
+             hjust = 0,
+             vjust = 0.5
+             ) +
+  # Annotation lines
+  geom_segment(data = annotation_line,
+               aes(x = x, xend = xend , y = y, yend = yend),
+               colour = "#FFFFFF",
+               arrow = arrow(length = unit(0.08, "inch")), 
+               size = 0.5
+               ) +
+  scale_x_continuous(limits = c(73, 92), breaks = seq(75, 90, 5)) +
+  scale_y_continuous(limits = c(4, 14), breaks = seq(4, 14, 2)) +
+  # Facet by season number and add season labels to each facet
+  facet_wrap(~season_number, nrow = 3, labeller = labeller(season_number = season_labels)) +
+  labs(title = "Doctor Who Christmas specials attract viewers, but are not highly rated",
+       subtitle = "Rating received for each episode of Doctor Who when it first aired in the UK (Appreciation Index 0 - 100), versus the\nnumber of people, in millions, who viewed it. Each dot represents one episode in each season of the revived era.",
+       x = "Rating (Audience Appreciation Index 0 - 100)",
+       y = "Number of UK viewers (millions)",
+       colour = "",
+       caption = "Notes:\n(1) Average (mean) ratings and viewers exclude Christmas specials.\n(2) Season 1-10 Christmas specials aired on Christmas day. Season 11-12 Christmas specials aired on New Year's day.\n  \nTidy Tuesday: Week 48, 2021 | Data source: datardis package | Visualisation: @Fi_Lees") 
+
+p_final
+
+```
+
+Save the plot as an image.  
+
+```{r save_image}
+
+# Tell showtext to use DPI of 300 so text size is correct when chart is saved as an image
+showtext_opts(dpi = 300)
+
+ggsave("dr_who.png", p_final, width = 12, height = 11, units = "in", dpi = 300)
+
+# Turn off showtext
+showtext_auto(FALSE)
+
+```
+
+
+### Final Thoughts
+My final chart isn't about showing exact figures, it's more about showing a general pattern (Christmas specials tend to attract higher numbers of viewers relative to other episodes within a season, but they also tend to rate below average). I'm guessing many of the viewers who tune into the Xmas specials are not die hard Dr Who fans.  
+
+Seasons 11 and 12 (Jodie Whittaker) look a bit different though. Moving the Christmas special to New Year's day may have impacted viewing figures.  
+
+
+### Session Information
+```{r session_info}
+
+sessionInfo()
+
+```
+
+

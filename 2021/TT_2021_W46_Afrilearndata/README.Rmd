@@ -1,0 +1,367 @@
+---
+title: "Tidy Tuesday: 2021, Week 46, AfriLearnData"
+author: "Fiona Lees"
+date: 2021-11-22
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.width = 12, 
+                      fig.asp = 0.618, 
+                      out.width = "100%",
+                      fig.align = "center")
+
+```
+
+## AfriLearnData
+The data this week is provided by [`afrilearndata`](https://afrimapr.github.io/afrilearndata/). This package provides small African spatial datasets to help with the learning and teaching of spatial techniques and mapping. Its purpose is to provide analysts based in Africa with relatable example datasets. More generally it aims to support the growth of R and mapping in Africa. It's part of the afrimapr project, providing R building blocks, training and community.  
+
+
+### Objectives
+This week I'm going to take a closer look at African population density data for the years 2000 (`afripop2000`) and 2020 (`afripop2020`). The data consist of two raster grids showing the estimated population density per square km, aggregated to mean per 20km square, in Africa. The projection is Geographic Coordinate System, WGS84.  
+
+My plan is to draw a map for each year showing population density.  
+
+
+### Learning Points
+This week I learned I still have **a lot** to learn about drawing maps; even simple ones can be tricky. I definitely have renewed respect for cartographers. The main things I learned this week related to:  
+
+- **Raster Data:** Apart from briefly reading about raster data in an on-line tutorial, I hadn't used it before. Raster data contains cells that have values assigned to them. The raster data in `afripop2000` and `afripop2020` has a cell for each 20km square in Africa; the x and y values associated with each cell give its geographic location (x = longitude, y = latitude). The value assigned to each cell is the estimated population density per square km for that 20km square.  
+
+- **Colour (again):** Choosing the right colours for any visualisation can be tricky, but I find this to be especially true for raster data. Although I don't discuss them all in this document, I played around with several palettes specifically designed for cartographic data (`RColorBrewer`, `rcartocolor` and `scico`). There was a really helpful [Twitter thread](https://twitter.com/geokaramanis/status/1458495769217060878) about the use of colour specifically relating to this dataset.  
+
+- **Animated JPEGs**: Via a great [TidyTuesday visualisation I saw on Twitter](https://twitter.com/georgeryang/status/1458209549287051265), I learned how to use the `magick` package to create an animated JPEG that switches between maps showing the 2000 and 2020 population density data.  
+
+
+### Load Packages
+Load the required packages.  
+
+```{r packages}
+
+library(afrilearndata)
+library(raster)
+library(sf)
+library(rnaturalearth)
+library(patchwork)
+library(magick)
+library(scico)
+library(showtext)
+library(tidyverse)
+
+```
+
+
+### Import Data
+The `afrilearndata` package permits lazy loading (LazyData: true); a technique to load or process data only when needed. I've loaded the `afrilearndata` package already, so I can access the objects that contain the population density data directly.
+
+```{r import_data}
+
+# Just looking at the population data for the year 2000 shows me that it's raster data
+afripop2000
+
+# Coerce the raster layer data into a data frame with spatial coordinates so that we have the option of using ggplot to visualise this data
+afripop_2000_df <- afripop2000 %>%
+  as.data.frame(xy = TRUE) %>%
+  # Tidy-up variable names
+  rename(population = ppp_2000_1km_Aggregated) %>%
+  # Remove rows with no population data
+  filter(!is.na(population))
+
+# Repeat for 2020 data
+afripop2020
+
+afripop_2020_df <- afripop2020 %>%
+  as.data.frame(xy = TRUE) %>%
+  rename(population = ppp_2020_1km_Aggregated) %>%
+  filter(!is.na(population))
+
+```
+
+By running a quick summary on each dataset I can see that the x / y (lon / lat) boundaries are the same in each. I can also see that the range in the population variable is **huge** (in 2020 it spans from 0 to 21,181 people per square km), but the data are extremely skewed (very long tail to the right). To be fair, I already got a lot of this information from the steps above, but running the summary helped me to see how skewed the data are.
+
+```{r summary}
+
+summary(afripop_2000_df)
+
+summary(afripop_2020_df)
+
+```
+
+
+### Explore Data
+I'd like to take a closer look at the distribution of the population variable in both years. My first attempt (below) is not very informative. The data are so right-skewed I can't see anything useful.  
+
+```{r pop_den_distribution, fig.asp = 0.3, fig.alt = "Panel chart showing the distribution of the population variable in the 2000 and 2020 datasets. The data for both years are very right-skewed."}
+
+
+# Set theme to minimal
+theme_set(theme_minimal())
+
+# Chart for 2000 data
+p_dist_2000 <- afripop_2000_df %>%
+  ggplot() +
+  geom_histogram(aes(x = population), binwidth = 100, boundary = 0) +
+  labs(title = "Distribution of population density, 2000",
+       x = "Population density (people per square km)")
+
+# Chart for 2020 data
+p_dist_2020 <- afripop_2020_df %>%
+  ggplot() +
+  geom_histogram(aes(x = population), binwidth = 100, boundary = 0) +
+  labs(title = "Distribution of population density, 2020",
+       x = "Population density (people per square km)")
+
+# Patchwork is loaded so I can patch the charts together into one
+p_dist_2000 + p_dist_2020
+
+```
+
+I can log-transform the y-axis (count) to get a better look at what's going on.  
+
+```{r pop_den_distribution_log, fig.asp = 0.3, fig.alt = "Panel chart showing the distribution of the population variable in the 2000 and 2020 datasets. The y-axis has been log transformed (base 10). The data for both years are very right-skewed."}
+
+p_dist_2000 <- p_dist_2000 +
+  scale_y_log10(labels = scales::comma)
+
+p_dist_2020 <- p_dist_2020 +
+  scale_y_log10(labels = scales::comma)
+
+p_dist_2000 + p_dist_2020
+
+```
+
+Now, let's try looking at the distribution data as a table. I'll add proportion and cumulative proportion information too. It's now much clearer that the vast majority of areas have a population density of less than 100; more than 99% of areas have a population density below 600. This applies to both years.
+
+```{r pop_den_distribution_table}
+
+afripop_2000_df %>%
+  count(cut_width(population, width = 100, boundary = 0)) %>%
+  mutate(
+    prop = proportions(n),
+    cum_prop = round(cumsum(prop), 4),
+    prop = round(prop, 4)
+  ) %>%
+  slice_head(n = 10)
+
+afripop_2020_df %>%
+  count(cut_width(population, width = 100, boundary = 0)) %>%
+  mutate(
+    prop = proportions(n),
+    cum_prop = round(cumsum(prop), 4),
+    prop = round(prop, 4)
+  ) %>%
+  slice_head(n = 10)
+
+```
+
+
+### Wrangle Data
+Viewing some other #TidyTuesday visualisations for week 46 that also looked at population density, I've been back and forth a bit around how to bin the data and whether or not to show it on a continuous scale.   
+
+Like some other TidyTuesday-ers ([1](https://twitter.com/geokaramanis/status/1458495769217060878?s=20), [2](https://twitter.com/NearandDistant/status/1458550050330664961)) I was initially tempted to bin all values over 400 or 600 together and focus on differences at the lower end of the scale (because that's where the vast majority of the data points are). However, after some trial and error, reading [some discussion on this topic](https://twitter.com/afrimapr/status/1458515064349241347), and seeing some other options ([1](https://twitter.com/georgeryang/status/1458209549287051265), [2](https://twitter.com/datasciencejenn/status/1458543798074499076)), I'm persuaded that it's more interesting to see differences between areas of very small and very large population density.
+
+Based on this I'm going to bin population density using the following breaks: 0, 2, 20, 200, 2000, 22000. I'll also use a discrete scale rather than a continuous one.  
+
+```{r cut_population_data}
+
+afripop_2000_df <- afripop_2000_df %>%
+  mutate(population_2 = cut(
+    population,
+    breaks = c(-0.1, 2, 20, 200, 2000, 22000),
+    labels = c("0 - 2", "2 - 20", "20 - 200", "200 - 2,000", "2,000 - 22,000")
+  ))
+
+afripop_2020_df <- afripop_2020_df %>%
+  mutate(population_2 = cut(
+    population,
+    breaks = c(-0.1, 2, 20, 200, 2000, 22000),
+    labels = c("0 - 2", "2 - 20", "20 - 200", "200 - 2,000", "2,000 - 22,000")
+  ))
+
+```
+
+Just to get a sense of what the population density looks like, I'll draw a very quick plot of the 2020 data with no special formatting / labelling (oh, those default colours are hurting my eyes!)
+
+```{r first_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020 (rough draft without any special formatting)."}
+
+ggplot(data = afripop_2020_df) +
+  # geom_raster plots the raster data, but you could also use geom_tile
+  geom_raster(aes(x, y, fill = population_2)) +
+  coord_fixed()
+
+```
+
+Looking at the initial map above, it occurs to me that Africa seems more densely populated around its coastline, lakes, rivers. I'd like to be able to see this more clearly by showing the main rivers on the map. The `afrilearndata` package doesn't have data for African rivers, but I know the `rnaturalearth` package has river information for the whole world (I saw this a few weeks ago in a tutorial called [Mapping Geographic Data in R, with ggplot2](https://flowingdata.com/mapping-in-r-ggplot2/) on the Flowing Data website.)  
+
+I'm going to pull the global river information in and see if I can add it to my plot.  
+
+```{r get_river_data}
+
+rivers <- ne_download(scale = 10, type = "rivers_lake_centerlines", category = "physical", returnclass = "sf")
+
+```
+
+```{r first_map_with_rivers, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020. Also shows main African rivers (rough draft without any special formatting)."}
+
+ggplot(data = afripop_2020_df) +
+  geom_raster(aes(x, y, fill = population_2)) +
+  geom_sf(data = rivers) +
+  # Trim longitude / latitude coordinates to fit Africa otherwise we'll see rivers across the world
+  # I'll use the min / max coordinates in the afripop datasets as a guide.
+  coord_sf(xlim = c(-17.62625, 51.20708), ylim = c(-34.97542, 37.35792))
+
+```
+
+
+### Visualise Data
+Okay, now I'll try to tidy everything up and make the map look a bit nicer.
+
+First, I'll set-up the fonts I want to use.  
+
+```{r fonts}
+
+# Load fonts
+font_add_google("Lato")
+font_add_google("Playfair Display")
+
+# Use showtext to render the text
+showtext_auto(TRUE)
+
+```
+
+Having messed about with various colour palettes (not shown here), I decided to use one from the `scico` package called **acton**. However, I'm only going to use part of this palette to show the population data. I want to grab the darkest colour in the palette to use as a background colour (ocean). I'm doing this for two reasons:  
+
+1) It was hard to find a colour to use as a background that didn't clash with the acton palette. By using a colour from the palette itself, the colour scheme for the whole map remains cohesive.  
+
+2) I tried using various light coloured backgrounds, but this caused the large lakes in Africa (e.g. Lake Victoria) to get lost in amongst the population density data. I really want the lakes to look like lakes, not areas of low population density. I can also use this dark colour for the rivers.  
+
+I'm going to call the palette directly when I draw the maps, but by reading the palette into a variable at this stage it's easy for me to see the hex values for each colour. This means I can pick out the darkest one to use for the background and the lightest one to use for the text. 
+
+```{r colours}
+
+(pop_den_colour <- scico(n = 15, palette = "acton", direction = 1))
+
+```
+
+
+Now to build the map for the year 2000.
+
+```{r 2000_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2000. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib)."}
+
+# Build a base plot
+p_map_base <- ggplot(data = afripop_2000_df) +
+  geom_raster(aes(x, y, fill = population_2)) +
+  # Use only the lightest 80% of the acton colour palette for the population data
+  scale_fill_scico_d(direction = -1, palette = "acton", begin = 0.2, end = 1) +
+  geom_sf(data = rivers, colour = "#2D204C", size = 0.3) +
+  # Trim longitude / latitude coordinates to fit Africa 
+  coord_sf(xlim = c(-17.62625, 51.20708), ylim = c(-34.97542, 37.35792)) +
+  # Remove all grid lines etc.
+  theme_void() +
+  theme(
+    text = element_text(family = "Lato", colour = "#E5E5F0"),
+    plot.caption = element_text(size = 10, margin = margin(b = 10), hjust = 0.98, lineheight = 1.1),
+    plot.background = element_rect(colour = NA, fill = "#2D204C"),
+    legend.position = c(0.21, 0.25),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(rep(8, 8)),
+    ) +
+  labs(
+    caption = "Tidy Tuesday: Week 46, 2021\n Data source: afrilearndata\n Visualisation: @Fi_Lees",
+    fill = "Population density\n(people / km²)"
+    )
+
+# Add year 2000 label to the plot - positioning it above the legend
+p_map_2000 <- p_map_base +
+  annotate("text", -5, -5, label = "Africa\n2000", 
+           size = 16, family = "Playfair Display", fontface = "bold", 
+           colour = "#E5E5F0", lineheight = 0.8)
+
+p_map_2000
+
+```
+
+Using the base plot created above, swap the 2000 data for the 2020 data and create a map for 2020.
+
+```{r 2020_map, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020. In general, Africa is more densely populated around its coastline, lakes, rivers. It is sparsely populated in desert areas (for example the Sahara, Kalahari and Namib). Population density in Africa increased between 2000 and 2020, especially around the Niger and Nile rivers and Lake Victoria."}
+
+# Update base plot with 2020 data and add year 2020 label
+p_map_2020 <- p_map_base %+% afripop_2020_df +
+    annotate("text", -5, -5, label = "Africa\n2020", 
+           size = 16, family = "Playfair Display", fontface = "bold", 
+           colour = "#E5E5F0", lineheight = 0.8)
+
+p_map_2020
+
+```
+
+Save both maps as images.  
+
+```{r save_map}
+
+# Tell showtext to use DPI of 300 so text size is correct when chart is saved as an image
+showtext_opts(dpi = 300)
+
+ggsave("p_map_2000.png", p_map_2000, width = 10, height = 10, units = "in", dpi = 300)
+ggsave("p_map_2020.png", p_map_2020, width = 10, height = 10, units = "in", dpi = 300)
+
+# Turn off showtext
+showtext_auto(FALSE)
+
+```
+
+My original plan was to show the maps for 2000 and 2020 side-by side, but I came across a [cool idea on Twitter, posted by another TidyTuesday-er](https://twitter.com/georgeryang/status/1458209549287051265), showing an animated JPEG that switches between the two years. Using the code he posted, I was able to create a JPEG too. Thank you George!
+
+```{r create_gif}
+
+# Create GIF using magick package
+list.files(path = ".", pattern = '*.png') %>% 
+  image_read() %>%
+  image_join() %>%
+  image_animate(fps = 0.5) %>%
+  image_write("africa_pop_density_animated.gif")
+
+```
+
+
+### Final Notes
+As in previous weeks I've used ggplot to create my maps, but it was interesting to see other packages being used in this week's TidyTuesday. I had planned to try out the `tmap` package and compare it to ggplot, but I ran out of time (messing about with colour). I'm putting this note here as a reminder to myself to explore `tmap` further when I have time. Here is a quick demo of `tmap` below.  
+
+```{r tmap_example, fig.asp = 1, fig.alt = "Image showing population density map for Africa for the year 2020, along with country boundaries and locations of capital cities. Created using the R tmap package."}
+
+library(tmap)
+
+tm_shape(afripop2020) +
+  tm_raster(title = "Population density\n(people / km²)",
+            breaks = c(0, 2, 20, 200, 2000, 22000),
+            palette = "Blues") + 
+  tm_shape(africountries) +
+  tm_borders(col = "grey50") +
+  tm_shape(africapitals) +
+  tm_dots(size = 0.12, col = "orangered1") +
+  tm_layout(main.title = "Population Density: Africa 2020",
+            inner.margins = c(top = 0.1),
+            frame = FALSE,
+            legend.position = c(0.1, 0.2),
+            main.title.position = "centre",
+            main.title.size = 2
+            )
+
+```
+
+
+### Session Information
+```{r session_info}
+
+sessionInfo()
+
+```
+
+
