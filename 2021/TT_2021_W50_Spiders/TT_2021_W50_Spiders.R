@@ -126,7 +126,7 @@ p_final <- ggraph(nested_edge_list, layout = 'dendrogram', circular = TRUE) +
     legend.position = "none"
   ) +
   # Titles
-  labs(title = "World's most recently described species of spiders",
+  labs(title = "The world's most recently described spiders species",
        subtitle = "Colour indicates spider family.  Labels show family | genus | species of each spider",
        caption = "Tidy Tuesday: Week 50, 2021\nVisualisation: @Fi_Lees\nData source: World Spider Catalog (2021) and the Natural History Museum of Bern. (Version 22.5, accessed on 7th December 2021)"
   )
@@ -135,7 +135,7 @@ p_final <- ggraph(nested_edge_list, layout = 'dendrogram', circular = TRUE) +
 showtext_opts(dpi = 300)
 
 # Save plot as an image  
-ggsave("recent_spiders.png", p_final, width = 12, height = 12, units = "in", dpi = 300)
+ggsave("recent_spiders.png", p_final, width = 10, height = 11, units = "in", dpi = 300)
 
 # Turn off showtext
 showtext_auto(FALSE)

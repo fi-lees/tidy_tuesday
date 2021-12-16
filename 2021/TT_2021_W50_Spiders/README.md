@@ -39,34 +39,23 @@ Let's have a quick look at the data.
 
 
 ```r
-#view(spiders)
+view(spiders)
 
-summary(spiders)
+knitr::kable(
+  summary(spiders)
+)
 ```
 
-```
-##    speciesId     species_lsid          family             genus          
-##  Min.   :    1   Length:49785       Length:49785       Length:49785      
-##  1st Qu.:12857   Class :character   Class :character   Class :character  
-##  Median :25587   Mode  :character   Mode  :character   Mode  :character  
-##  Mean   :26766                                                           
-##  3rd Qu.:38579                                                           
-##  Max.   :59774                                                           
-##    species           subspecies           author               year     
-##  Length:49785       Length:49785       Length:49785       Min.   :1757  
-##  Class :character   Class :character   Class :character   1st Qu.:1910  
-##  Mode  :character   Mode  :character   Mode  :character   Median :1978  
-##                                                           Mean   :1959  
-##                                                           3rd Qu.:2006  
-##                                                           Max.   :2021  
-##   parentheses     distribution      
-##  Min.   :0.0000   Length:49785      
-##  1st Qu.:0.0000   Class :character  
-##  Median :0.0000   Mode  :character  
-##  Mean   :0.2707                     
-##  3rd Qu.:1.0000                     
-##  Max.   :1.0000
-```
+
+
+|   |  speciesId   |species_lsid     |   family        |   genus         |  species        | subspecies      |   author        |     year    | parentheses   |distribution     |
+|:--|:-------------|:----------------|:----------------|:----------------|:----------------|:----------------|:----------------|:------------|:--------------|:----------------|
+|   |Min.   :    1 |Length:49785     |Length:49785     |Length:49785     |Length:49785     |Length:49785     |Length:49785     |Min.   :1757 |Min.   :0.0000 |Length:49785     |
+|   |1st Qu.:12857 |Class :character |Class :character |Class :character |Class :character |Class :character |Class :character |1st Qu.:1910 |1st Qu.:0.0000 |Class :character |
+|   |Median :25587 |Mode  :character |Mode  :character |Mode  :character |Mode  :character |Mode  :character |Mode  :character |Median :1978 |Median :0.0000 |Mode  :character |
+|   |Mean   :26766 |NA               |NA               |NA               |NA               |NA               |NA               |Mean   :1959 |Mean   :0.2707 |NA               |
+|   |3rd Qu.:38579 |NA               |NA               |NA               |NA               |NA               |NA               |3rd Qu.:2006 |3rd Qu.:1.0000 |NA               |
+|   |Max.   :59774 |NA               |NA               |NA               |NA               |NA               |NA               |Max.   :2021 |Max.   :1.0000 |NA               |
 
 
 ### Explore Data
@@ -257,7 +246,7 @@ ggraph(nested_edge_list, layout = 'dendrogram', circular = FALSE) +
     ) +
   # Titles
   labs(
-      title = "The world's most recently described species of spiders",
+      title = "The world's most recently described spider species",
       subtitle = "Family | Genus | species"
       )
 ```
@@ -327,7 +316,7 @@ p_final <- ggraph(nested_edge_list, layout = 'dendrogram', circular = TRUE) +
     legend.position = "none"
   ) +
   # Titles
-  labs(title = "World's most recently described species of spiders",
+  labs(title = "The world's most recently described spider species",
        subtitle = "Colour indicates spider family.  Labels show family | genus | species of each spider",
        caption = "Tidy Tuesday: Week 50, 2021\nVisualisation: @Fi_Lees\nData source: World Spider Catalog (2021) and the Natural History Museum of Bern. (Version 22.5, accessed on 7th December 2021)"
        )
@@ -345,7 +334,7 @@ Save the plot as an image.
 showtext_opts(dpi = 300)
 
 # Save plot as image
-ggsave("recent_spiders.png", p_final, width = 12, height = 12, units = "in", dpi = 300)
+ggsave("recent_spiders.png", p_final, width = 10, height = 11, units = "in", dpi = 300)
 
 # Turn off showtext
 showtext_auto(FALSE)
