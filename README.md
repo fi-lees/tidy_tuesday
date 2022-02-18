@@ -10,6 +10,10 @@ Apart from the odd dabble, I only really started using R in 2021 (I've been usin
 
 ## 2022
 
+### Week 7 - Du Bois Challenge [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W7_DuBoisChallenge/TT_2022_W7_DuBoisChallenge.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W7_DuBoisChallenge/README.md)
+![/2022/TT_2022_W7_DuBoisChallenge/DuBois_Plate22.png](2022/TT_2022_W7_DuBoisChallenge/DuBois_Plate22.png)
+------
+
 ### Week 2 - Bee Colonies [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W2_BeeColonies/TT_2022_W2_BeeColonies.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W2_BeeColonies/README.md)
 ![/2022/TT_2022_W2_BeeColonies/Bee_Colony_Loss.png](2022/TT_2022_W2_BeeColonies/Bee_Colony_Loss.png)
 ------
