@@ -10,6 +10,10 @@ Apart from the odd dabble, I only really started using R in 2021 (I've been usin
 
 ## 2022
 
+### Week 8 - Freedom in the World [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W8_Freedom/TT_2022_W8_Freedom.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W8_Freedom/README.md)
+![/2022/TT_2022_W8_Freedom/freedom_2020.png](2022/TT_2022_W8_Freedom/freedom_2020.png)
+------
+
 ### Week 7 - Du Bois Challenge [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W7_DuBoisChallenge/TT_2022_W7_DuBoisChallenge.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W7_DuBoisChallenge/README.md)
 ![/2022/TT_2022_W7_DuBoisChallenge/DuBois_Plate22.png](2022/TT_2022_W7_DuBoisChallenge/DuBois_Plate22.png)
 ------
