@@ -1,4 +1,7 @@
 ## Freedom in the World
+
+**Note added 1st Mar 2022**: Index such as the "Freedom Index" have potential for bias and/or miscalculation. Data such as these are far from perfect and may misrepresent nuanced political situations or oversimplify difficult to record/measure political nuance.  
+
 The [data](https://freedomhouse.org/report/freedom-world) this week comes from [Freedom House](https://freedomhouse.org/). It provides freedom index scores and freedom statuses for 195 countries and 15 territories. Global freedom statuses are calculated on a weighted scale, based on 10 political rights indicators and 15 civil liberties indicators.The combination of the overall score awarded for political rights and the overall score awarded for civil liberties, after being equally weighted, determines a status of Not Free, Partly Free, or Free. More information on the methodology is provided [here](https://freedomhouse.org/reports/freedom-world/freedom-world-research-methodology).  
 
 [Arthur Cheib](https://github.com/ArthurCheib/analytical-politics-project/blob/main/data/tidy-data-fh-un.csv) kindly made the dataset available to Tidy Tuesday. However, after spending a bit of time reading about the data and how it's collected, I decided to pull a fuller dataset directly from the Freedom House website. This was mainly so I could use the overall index scores in my analysis rather than the separate ratings for civil liberties and political rights.  
@@ -490,7 +493,7 @@ p_final <- countries_2020 %>%
     y = "",
     colour = "",
     fill = "",
-    caption = "Global freedom statuses are calculated on a weighted scale, based on 10 political rights indicators and 15 civil liberties indicators.\nThe combination of the overall score awarded for political rights and the overall score awarded for civil liberties, after being equally\nweighted, determines the status of Not Free, Partly Free, or Free. Data based on status Jan 1 - Dec 31 2020.\n \nVisualisation: Fiona Lees (@Fi_Lees) | Source: Freedom House | Tidy Tuesday: Week 8, 2022"
+    caption = "Note: These type of index have potential for bias / miscalculation. They are far from perfect and may misrepresent / oversimplify nuanced political situations.\n \nGlobal freedom statuses are calculated on a weighted scale, based on 10 political rights indicators and 15 civil liberties indicators.\nThe combination of the overall score awarded for political rights and the overall score awarded for civil liberties, after being equally\nweighted, determines the status of Not Free, Partly Free, or Free. Data based on status Jan 1 - Dec 31 2020.\n \nVisualisation: Fiona Lees (@Fi_Lees) | Source: Freedom House | Tidy Tuesday: Week 8, 2022"
     )
 
 p_final
@@ -547,8 +550,8 @@ sessionInfo()
 ##  [4] httr_1.4.2          tools_4.1.2         backports_1.4.1    
 ##  [7] bslib_0.3.1         utf8_1.2.2          R6_2.5.1           
 ## [10] rpart_4.1-15        vipor_0.4.5         Hmisc_4.6-0        
-## [13] DBI_1.1.2           colorspace_2.0-2    nnet_7.3-16        
-## [16] withr_2.4.3         tidyselect_1.1.1    gridExtra_2.3      
+## [13] DBI_1.1.2           colorspace_2.0-3    nnet_7.3-16        
+## [16] withr_2.4.3         tidyselect_1.1.2    gridExtra_2.3      
 ## [19] rematch_1.0.1       curl_4.3.2          compiler_4.1.2     
 ## [22] textshaping_0.3.6   cli_3.2.0           rvest_1.0.2        
 ## [25] htmlTable_2.4.0     xml2_1.3.3          sass_0.4.0         
@@ -558,18 +561,18 @@ sessionInfo()
 ## [37] htmltools_0.5.2     highr_0.9           dbplyr_2.1.1       
 ## [40] fastmap_1.1.0       htmlwidgets_1.5.4   rlang_1.0.1        
 ## [43] readxl_1.3.1        rstudioapi_0.13     farver_2.1.0       
-## [46] jquerylib_0.1.4     generics_0.1.2      jsonlite_1.7.3     
+## [46] jquerylib_0.1.4     generics_0.1.2      jsonlite_1.8.0     
 ## [49] magrittr_2.0.2      Formula_1.2-4       Matrix_1.4-0       
 ## [52] Rcpp_1.0.8          munsell_0.5.0       fansi_1.0.2        
-## [55] lifecycle_1.0.1     stringi_1.7.6       yaml_2.2.2         
+## [55] lifecycle_1.0.1     stringi_1.7.6       yaml_2.3.5         
 ## [58] snakecase_0.11.0    grid_4.1.2          crayon_1.5.0       
 ## [61] lattice_0.20-45     haven_2.4.3         splines_4.1.2      
 ## [64] hms_1.1.1           knitr_1.37          pillar_1.7.0       
-## [67] reprex_2.0.1        glue_1.6.1          evaluate_0.14      
+## [67] reprex_2.0.1        glue_1.6.2          evaluate_0.15      
 ## [70] latticeExtra_0.6-29 data.table_1.14.2   modelr_0.1.8       
 ## [73] vctrs_0.3.8         png_0.1-7           tzdb_0.2.0         
 ## [76] cellranger_1.1.0    gtable_0.3.0        assertthat_0.2.1   
 ## [79] xfun_0.29           janitor_2.1.0       broom_0.7.12       
-## [82] ragg_1.2.1          survival_3.2-13     beeswarm_0.4.0     
+## [82] ragg_1.2.2          survival_3.2-13     beeswarm_0.4.0     
 ## [85] cluster_2.1.2       ellipsis_0.3.2
 ```
