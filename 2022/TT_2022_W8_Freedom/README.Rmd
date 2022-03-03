@@ -226,7 +226,7 @@ p_final <- countries_2020 %>%
   theme_minimal() +
   theme(
     text = element_text(family = "Lato", colour = "grey40", size = 12),
-    plot.title = element_text(family = "Roberto Slab", colour = "black", size = 16, 
+    plot.title = element_text(family = "Roboto Slab", colour = "black", size = 16, 
                               face = "bold", margin = margin(b = 5), hjust = 0),
     plot.subtitle = element_text(size = 12, margin = margin(b = 0), hjust = 0),
     plot.caption = element_text(size = 10, margin = margin(t = 10), hjust = 0),

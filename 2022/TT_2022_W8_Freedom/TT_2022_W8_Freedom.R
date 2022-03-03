@@ -127,7 +127,7 @@ p_final <- countries_2020 %>%
   theme_minimal() +
   theme(
     text = element_text(family = "Lato", colour = "grey40", size = 12),
-    plot.title = element_text(family = "Roberto Slab", colour = "black", size = 16, 
+    plot.title = element_text(family = "Roboto Slab", colour = "black", size = 16, 
                               face = "bold", margin = margin(b = 5), hjust = 0),
     plot.subtitle = element_text(size = 12, margin = margin(b = 0), hjust = 0),
     plot.caption = element_text(size = 10, margin = margin(t = 10), hjust = 0),
@@ -153,7 +153,7 @@ p_final <- countries_2020 %>%
     y = "",
     colour = "",
     fill = "",
-    caption = "Global freedom statuses are calculated on a weighted scale, based on 10 political rights indicators and 15 civil liberties indicators.\nThe combination of the overall score awarded for political rights and the overall score awarded for civil liberties, after being equally\nweighted, determines the status of Not Free, Partly Free, or Free. Data based on status Jan 1 - Dec 31 2020.\n \nVisualisation: Fiona Lees (@Fi_Lees) | Source: Freedom House | Tidy Tuesday: Week 8, 2022"
+    caption = "Note: These type of index have potential for bias / miscalculation. They are far from perfect and may misrepresent / oversimplify nuanced political situations.\n \nGlobal freedom statuses are calculated on a weighted scale, based on 10 political rights indicators and 15 civil liberties indicators.\nThe combination of the overall score awarded for political rights and the overall score awarded for civil liberties, after being equally\nweighted, determines the status of Not Free, Partly Free, or Free. Data based on status Jan 1 - Dec 31 2020.\n \nVisualisation: Fiona Lees (@Fi_Lees) | Source: Freedom House | Tidy Tuesday: Week 8, 2022"
   )
 
 # Tell showtext to use DPI of 300 so text size is correct when chart is saved as an image
