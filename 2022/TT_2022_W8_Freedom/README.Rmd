@@ -173,7 +173,7 @@ font_add_google("Roboto Slab")
 
 Now I'll create the chart.    
 
-```{r p_final, fig.width = 12, fig.height = 9.5, fig.alt="Beeswarm chart showing global freedom index scores for 195 countries in six world regions (range 0 - 100, 100 being the most free). The freedom status of each country (not free, partly free, free) is also shown. Overall, scores are highest in Europe (Finland, Norway and Sweden = 100), whereas scores in the Middle East and North Africa are the lowest (Syria = 1)."}
+```{r p_final, fig.width = 12, fig.height = 10, fig.alt="Beeswarm chart showing global freedom index scores for 195 countries in six world regions (range 0 - 100, 100 being the most free). The freedom status of each country (not free, partly free, free) is also shown. Overall, scores are highest in Europe (Finland, Norway and Sweden = 100), whereas scores in the Middle East and North Africa are the lowest (Syria = 1)."}
 
 p_final <- countries_2020 %>% 
   ggplot(aes(x = total, y = region_2, fill = status, colour = hi_low_country)) +
@@ -190,7 +190,8 @@ p_final <- countries_2020 %>%
   # Text labels for lowest scores
   geom_label(
     data = countries_2020_low, 
-    aes(label = country), 
+    aes(label = country),
+    family = "Lato",
     colour = "grey40",
     fill = "white",
     size = 3.88, 
@@ -206,6 +207,7 @@ p_final <- countries_2020 %>%
   geom_label(
     data = countries_2020_high, 
     aes(label = country), 
+    family = "Lato",
     colour = "grey40", 
     fill = "white",
     size = 3.88, 
@@ -267,7 +269,7 @@ Save the plot as an image.
 showtext_opts(dpi = 300)
 
 # Save plot as image
-ggsave("freedom_2020.png", p_final, width = 12 , height = 9.5, units = "in", dpi = 300)
+ggsave("freedom_2020.png", p_final, width = 12 , height = 10, units = "in", dpi = 300)
 
 # Turn off showtext
 showtext_auto(FALSE)

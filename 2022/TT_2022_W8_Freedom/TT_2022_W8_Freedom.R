@@ -92,6 +92,7 @@ p_final <- countries_2020 %>%
   geom_label(
     data = countries_2020_low, 
     aes(label = country), 
+    family = "Lato",
     colour = "grey40",
     fill = "white",
     size = 3.88, 
@@ -107,6 +108,7 @@ p_final <- countries_2020 %>%
   geom_label(
     data = countries_2020_high, 
     aes(label = country), 
+    family = "Lato",
     colour = "grey40", 
     fill = "white",
     size = 3.88, 
@@ -160,7 +162,7 @@ p_final <- countries_2020 %>%
 showtext_opts(dpi = 300)
 
 # Save plot as image
-ggsave("freedom_2020.png", p_final, width = 12 , height = 9.5, units = "in", dpi = 300)
+ggsave("freedom_2020.png", p_final, width = 12 , height = 10, units = "in", dpi = 300)
 
 # Turn off showtext
 showtext_auto(FALSE)
