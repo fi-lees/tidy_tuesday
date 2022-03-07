@@ -10,6 +10,10 @@ Apart from the odd dabble, I only really started using R in 2021 (I've been usin
 
 ## 2022
 
+### Week 9 - Alternative Fuel Stations [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W9_AlternativeFuelStations/TT_2022_W9_AlternativeFuelStations.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W9_AlternativeFuelStations/README.md)
+![/2022/TT_2022_W9_AlternativeFuelStations/EVsPerPort.png](2022/TT_2022_W9_AlternativeFuelStations/EVsPerPort.png)
+------
+
 ### Week 8 - Freedom in the World [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W8_Freedom/TT_2022_W8_Freedom.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W8_Freedom/README.md)
 ![/2022/TT_2022_W8_Freedom/freedom_2020.png](2022/TT_2022_W8_Freedom/freedom_2020.png)
 ------
