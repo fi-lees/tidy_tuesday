@@ -1,4 +1,4 @@
-# Tidy Tuesday - A weekly social data project in R
+# Tidy Tuesday: A weekly social data project in R
 
 \#TidyTuesday is a weekly data challenge that focuses on data cleaning, wrangling and visualisation using the `R` programming language. The project was founded by **Thomas Mock** in 2018 and emerged out of the [`R for Data Science` textbook](https://r4ds.had.co.nz/) and the `R4DS Online Learning Community`.
 
@@ -24,6 +24,10 @@ Apart from the odd dabble, I only really started using R in 2021 (I've been usin
 
 ### Week 2 - Bee Colonies [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W2_BeeColonies/TT_2022_W2_BeeColonies.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W2_BeeColonies/README.md)
 ![/2022/TT_2022_W2_BeeColonies/Bee_Colony_Loss.png](2022/TT_2022_W2_BeeColonies/Bee_Colony_Loss.png)
+------
+
+### Week 1 - Formula One Motor Racing (revisited) [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W1_BYOD_Formula_1/TT_2022_W1_BYOD_Formula_1.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W1_BYOD_Formula_1/README.md)
+![/2022/TT_2022_W1_BYOD_Formula_1/F1Standings_2021.png](2022/TT_2022_W1_BYOD_Formula_1/F1Standings_2021.png)
 ------
 
 ## 2021
