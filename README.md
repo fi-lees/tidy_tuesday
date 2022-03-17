@@ -26,7 +26,7 @@ Apart from the odd dabble, I only really started using R in 2021 (I've been usin
 ![/2022/TT_2022_W2_BeeColonies/Bee_Colony_Loss.png](2022/TT_2022_W2_BeeColonies/Bee_Colony_Loss.png)
 ------
 
-### Week 1 - Formula One Motor Racing (revisited) [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W1_BYOD_Formula_1/TT_2022_W1_BYOD_Formula_1.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W1_BYOD_Formula_1/README.md)
+### Week 1 - Formula One Motor Racing (revisited) [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W1_BYOD_Formula_1/TT_2022_W1_BYOD_F1.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W1_BYOD_Formula_1/README.md)
 ![/2022/TT_2022_W1_BYOD_Formula_1/F1Standings_2021.png](2022/TT_2022_W1_BYOD_Formula_1/F1Standings_2021.png)
 ------
 
