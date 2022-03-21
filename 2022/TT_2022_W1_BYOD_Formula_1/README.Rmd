@@ -176,6 +176,7 @@ First, I'll load the font I want to use in my chart.
 
 # Fonts
 showtext_auto(enable = TRUE)
+font_add_google("Alfa Slab One")
 font_add_google("Titillium Web")
 
 ```
@@ -240,9 +241,9 @@ p_final <- data_for_chart %>%
   theme(
     text = element_text(family = "Titillium Web", colour = "grey20", size = 12),
     plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
-    plot.title = element_text(colour = "#e10600", size = 24, face = "bold.italic", 
+    plot.title = element_text(family = "Alfa Slab One", colour = "#e10600", size = 18, 
                               margin = margin(b = 5), hjust = 0),
-    plot.subtitle = element_text(size = 14, face = "bold", hjust = 0),
+    plot.subtitle = element_text(size = 12, face = "bold", hjust = 0),
     plot.caption = element_text(size = 8, hjust = 0),
     plot.background = element_rect(colour = "white", fill = "white"),
     panel.grid.minor = element_blank(),
@@ -255,7 +256,7 @@ p_final <- data_for_chart %>%
   # Titles
   labs(
     title = "FORMULA 1: 2021 STANDINGS",
-    subtitle = "FINAL CONSTRUCTOR AND DRIVER STANDINGS FOR THE 2021 SEASON",
+    subtitle = "CONSTRUCTOR AND DRIVER FINISHING POSITIONS FOR THE 2021 SEASON",
     x = "DRIVER POSITION",
     y = "CONSTRUCTOR\nPOSITION",
     caption = "VISUALISATION: FIONA LEES (@FI_LEES) | SOURCE: ERGAST API | TIDY TUESDAY: WEEK 1, 2022"
