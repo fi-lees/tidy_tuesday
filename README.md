@@ -1,6 +1,6 @@
 # Tidy Tuesday: A weekly social data project in R
 
-\#TidyTuesday is a weekly data challenge that focuses on data cleaning, wrangling and visualisation using the `R` programming language. The project was founded by **Thomas Mock** in 2018 and emerged out of the [`R for Data Science` textbook](https://r4ds.had.co.nz/) and the `R4DS Online Learning Community`.
+\#TidyTuesday is a weekly data challenge that focuses on data cleaning, wrangling and visualisation using the `R` programming language. The project was founded by **Thomas Mock** in 2018 and emerged out of the [`R for Data Science` textbook](https://r4ds.had.co.nz/) and [`R4DS Online Learning Community`](https://twitter.com/r4dscommunity).
 
 More information can be found here: https://github.com/rfordatascience/tidytuesday#readme.
 
