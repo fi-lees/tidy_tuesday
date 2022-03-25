@@ -1,0 +1,413 @@
+---
+title: "Tidy Tuesday: 2022, Week 12, Baby Names (USA)"
+author: "Fiona Lees"
+date: 2022-03-22
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      out.width = "100%",
+                      fig.align = "center")
+
+```
+
+## Baby Names (USA)
+The [data](http://hadley.github.io/babynames/) this week comes from Hadley Wickham's `{babynames}` package. The package contains three datasets provided by the US Social Security Administration (SSA):     
+- `babynames`: The number of children of each sex given each name (1880 - 2017). Only includes names used >5 times.   
+- `applicants`: The number of applicants for social security numbers, for each year, for each sex.  
+- `lifetables`: Cohort life tables data.  
+
+It also includes the following data from the US Census:  
+- `births`: Number of live births by year, up to 2017.  
+
+
+### Objectives
+This week my goal is to find the most popular name in each generation (male and female) and then look at how each name's popularity has changed across the generations (1901 - 2017).  
+
+
+### Learning Points
+The main things I learned about this week were:  
+
+- **{babynames}:** I've used the `babynames` package a few times in the past, while working my way through [R4DS](https://r4ds.had.co.nz/), but I haven't really looked at it in any detail. One of the things I hadn't really understood until now was how the `prop` variable was calculated. The official package notes describe this variable as: "n divided by total number of applicants in that year, which means proportions are of people of that sex with that name born in that year". However, the data dictionary on the #TidyTuesday web page, describes this variable as "Proportion of total births for that year". I was confused, so I spent a little time looking at this to make sure I understand what `prop` really means.  
+
+- **{ggridges}:** I wanted to try creating a ridgeline plot and I found a great package called `ggridges` that makes creating this type of chart fairly straightforward. It took me a wee while to decide which geom to use. I wanted a ridgeline rather than a density plot, so at first I used geom_ridgeline_gradient(). However, in the end I found it easier to scale my charts by using geom_density_ridges_gradient(). It's possible to draw ridgelines with geom_density_ridges_gradient() by setting the stat = "identity". The [package notes](https://wilkelab.org/ggridges/index.html) were really useful in helping me to work through this. 
+
+
+### Load Packages
+
+```{r packages}
+
+library(ggridges)
+library(rcartocolor)
+library(showtext)
+library(tidyverse)
+
+```
+
+
+### Import Data
+
+I'm going to pull the data in directly from {babynames}.  
+
+```{r import_data}
+
+babynames_usa <- babynames::babynames
+applicants_usa <- babynames::applicants
+births_usa <- babynames::births
+
+```
+
+Let's have a quick look at the data.      
+
+```{r summary}
+
+#view(babynames_usa)
+knitr::kable(summary(babynames_usa))
+
+#view(applicants_usa)
+knitr::kable(summary(applicants_usa))
+
+#view(births_usa)
+knitr::kable(summary(births_usa))
+
+```
+
+
+### Explore / Wrangle Data
+
+My first big question is, what does the `prop` variable actually tell us? I know it shows the proportion of babies given a certain name in a certain year, but what's the denominator? Is it a proportion of **all babies** (male and female) or of **all babies of that sex**?
+
+```{r data_explore_1}
+
+# Q: Is the denominator for `prop` all babies or babies of that sex?
+# A: Must be babies of that sex - proportions for each sex add up to 0.92 - 0.94 
+# (Note that names used <5 times are not included, so `prop` is never going to total 1.0)
+babynames_usa %>% 
+  group_by(year, sex) %>% 
+  summarise(
+    total_n = sum(n), 
+    total_prop = sum(prop)
+    )
+
+```
+
+Okay, the small piece of analysis above indicates the denominator must be babies of that sex, but I still don't fully understand what figures were used to calculate each proportion. Is the denominator in the `births` data? I don't think so.
+
+```{r data_explore_2}
+
+# Q: Is the denominator in the `births` data?
+# A: No, I don't thinks so - this information isn't split by sex
+births_usa
+
+```
+
+Can the denominator be found in the `applicants` data? I think maybe it can, let's check a few years of data.
+
+```{r data_explore_3}
+
+# Q: Is the denominator in the `applicants` data?
+# A: Perhaps, this data is split by sex.
+applicants_usa
+
+# Let's try calculating the proportion for a few examples and then cross check the result against 'babynames_usa$prop'.
+# Hurray! 
+# 'babynames_usa$prop' = proportion of all applicants of that sex in that year (applicants_usa$n_all) that had that name (babynames_usa$n).
+babynames_usa %>% 
+  filter(name == "Ashley", year %in% c(1901, 1952, 1983, 2015)) %>% 
+  left_join(applicants_usa, by = c("year", "sex")) %>% 
+  mutate(
+    prop_2 = n / n_all,
+    prop_check = near(prop,prop_2)
+  )
+
+```
+
+Now that we've established that 'prop' is the proportion of all SSA applicants of that sex in that year that had that name, it's time to move on to data prep.  
+
+My first data prep task is to assign each year to a generation. There are conflicting views on which years should be included in each generation. I'm going to go with the definitions suggested by the [Pew Research Centre](https://www.pewresearch.org/fact-tank/2019/01/17/where-millennials-end-and-generation-z-begins).
+
+```{r data_prep_1}
+
+# Assign each year to a generation. Drop years before 1901.
+baby_usa_1901_onwards <- babynames_usa %>% 
+  filter(year >= 1901) %>% 
+  mutate(generation = case_when(
+    between(year, 1901, 1927) ~ "Greatest Generation",
+    between(year, 1928, 1945) ~ "Silent Generation",
+    between(year, 1946, 1964) ~ "Baby Boomer",
+    between(year, 1965, 1980) ~ "Generation X",
+    between(year, 1981, 1996) ~ "Millennial",
+    between(year, 1997, 2012) ~ "Generation Z",
+    between(year, 2013, 2025) ~ "Alpha"
+  ))
+
+# Create a quick generation summary table
+# Looks like there is more diversity in names amongst the most recent generations 
+# (remember we're only in the middle of Alpha)
+baby_usa_1901_onwards %>% 
+  group_by(generation) %>% 
+  summarise(
+    min_year = min(year),
+    max_year = max(year),
+    unique_names = n_distinct(name)
+    ) %>% 
+  arrange(min_year) %>% 
+  ungroup()
+
+```
+
+Next, lets find the top male and female name for each generation. I'm choosing to define **top** as the name with the highest **number** of people called that name in a generation.
+
+```{r data_prep_2}
+
+# Summary table showing the top male and female name in each generation
+top_gen_names_summary <- baby_usa_1901_onwards %>% 
+  group_by(generation, sex, name) %>% 
+  summarise(
+    min_year = min(year),
+    max_year = max(year),
+    n_with_name = sum(n),
+    ) %>% 
+  slice(which(n_with_name == max(n_with_name))) %>% 
+  arrange(min_year, sex) %>% 
+  ungroup()
+
+# Vector with the top female names
+top_f <- top_gen_names_summary %>% 
+  filter(sex == "F") %>% 
+  pull(name)
+
+# Vector with the top male names
+top_m <- top_gen_names_summary %>% 
+  filter(sex == "M") %>% 
+  pull(name)
+
+```
+
+Create babyname datasets (one for female, one for male) showing the most popular names.
+
+```{r data_prep_3}
+
+# Create babynames dataset showing only the most popular female names
+top_gen_names_f <- baby_usa_1901_onwards %>% 
+  filter(sex == "F" & name %in% top_f) %>% 
+  mutate(name = factor(name, levels = unique(top_f))) %>% 
+  arrange(name, year)
+
+# Create babynames dataset showing only the most popular male names
+top_gen_names_m <- baby_usa_1901_onwards %>% 
+  filter(sex == "M" & name %in% top_m) %>% 
+  mutate(name = factor(name, levels = unique(top_m))) %>% 
+  arrange(name, year)
+
+```
+
+Right, I think we have what we need now. Lets' draw a quick couple of charts to see what we have.
+
+```{r initial_chart_f, fig.width = 8, fig.height = 4, fig.alt = "Basic line chart showing the most popular names for girls."}
+
+top_gen_names_f %>% 
+  ggplot(aes(x = year, y = prop, colour = name)) +
+  geom_line(size = 1) +
+  theme_minimal() +
+  theme(
+    legend.position = "top"
+  ) +
+  labs(title = "Top girls names")
+
+```
+
+```{r initial_chart_m, fig.width = 8, fig.height = 4, fig.alt = "Basic line chart showing the most popular names for boys."}
+
+top_gen_names_m %>% 
+  ggplot(aes(x = year, y = prop, colour = name)) +
+  geom_line(size = 1) +
+  theme_minimal() +
+  theme(
+    legend.position = "top"
+  ) +
+  labs(title = "Top boys names")
+
+```
+
+
+### Visualise Data
+I'm ready to start building my final visualisations now.  
+
+First, I'll load the fonts I want to use.  
+
+```{r fonts}
+
+# Fonts
+showtext_auto(enable = TRUE)
+font_add_google("Lato")
+font_add_google("Prata")
+
+```
+
+Next I'm going to create some annotation text to identify each generation and the top name within it.
+
+```{r annotation_text}
+
+# Annotation text
+annotation_text <- top_gen_names_summary %>% 
+  mutate(
+    label = str_c(generation, "\n(", name, ")"),
+    max_year = ifelse(max_year == 2017, 2025, max_year),
+    x = min_year + (((max_year + 1) - min_year) / 2),
+    y = ifelse(sex == "F", "Mary", "John")
+  )
+
+```
+
+I'm going to create two charts, one for girls and one for boys. First I'll create a base chart which will act as a foundation for both of my final charts.  
+
+```{r base_chart, fig.width = 9, fig.height = 6, fig.alt = "Basic base plot to build upon." }
+
+p_base <- top_gen_names_f %>% 
+  ggplot() +
+  # Ridge line plot
+  geom_density_ridges_gradient(
+    aes(x = year, y = fct_rev(name), height = prop, fill = prop), 
+    stat = "identity", 
+    scale = 1, 
+    colour = "grey85"
+    ) +
+  # Scales
+  scale_x_continuous(
+    limits = c(1901, 2026), 
+    breaks = c(1901, 1928, 1946, 1965, 1981, 1997, 2013, 2026),
+    expand = c(0.02, 0, 0.02, 0)
+    ) +
+  scale_y_discrete(
+    expand = expansion(add = c(0.1, 1.5)),
+    position = "right"
+    ) +
+  # Styling
+  theme_minimal() +
+  theme(
+    text = element_text(family = "Lato", colour = "grey40", size = 12),
+    plot.title = element_text(family = "Prata", colour = "black", size = 14, 
+                              face = "bold", margin = margin(b = 10), hjust = 0),
+    plot.subtitle = element_text(size = 12, hjust = 0),
+    plot.caption = element_text(size = 9, margin = margin(t = 10), hjust = 0),
+    plot.background = element_rect(colour = "white", fill = "white"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(linetype = "dashed", colour = "grey80"),
+    axis.text = element_text(size = 10, colour = "grey40"),
+    axis.title = element_text(size = 10, colour = "grey40", hjust = 0),
+    legend.position = "top",
+    legend.justification = 0.98,
+    legend.key.width = unit(0.3,"inch"),
+    legend.text = element_text(size = 9),
+    legend.margin = margin(t = 0, r = 0, b = 0, l = 0),
+    legend.box.margin = margin(t = -20, r = 0, b = 5, l = 0)
+    ) +
+  # Titles
+  labs(
+    x = "Year",
+    y = "",
+    fill = "",
+    caption = "Visualisation: Fiona Lees (@Fi_Lees) | Source: {babynames} R Package / US Social Security Administration | Tidy Tuesday: Week 12, 2022"
+    )
+
+p_base
+
+```
+
+Now I'll create the final chart for girls.
+
+```{r final_chart_f, fig.width = 9, fig.height = 7, fig.alt = "Ridgeline chart showing the rise and fall of each generation's most popular girl name (USA, 1901 - 2017). Greatest: Mary, Silent: Mary, Boomer: Mary, X: Jennifer, Millennial: Jessica, Z: Emily, Alpha: Emma."}
+
+# Chart for girls 
+p_final_f <- p_base +
+  # Fill colour for ridges
+  scale_fill_carto_c(
+    palette = "OrYel", 
+    labels = scales::label_percent(accuracy = 1), 
+    guide = guide_colourbar(reverse = TRUE)
+    ) +
+  # Annotation text
+  geom_text(
+    data = filter(annotation_text,sex == "F"),
+    aes(x = x, y = y, label = label),
+    family = "Lato",
+    colour = "grey40",
+    nudge_y = 1.3,
+    size = 3.4,
+    hjust = 0.5
+    ) +
+  # Titles
+  labs(
+    title = "The rise and fall of each generation's most popular name: Girls, USA",
+    subtitle = "Percentage of girls, born in each year, with each of these names (1901 - 2017)"
+    )
+  
+p_final_f
+
+```
+
+Finally, the chart for boys.
+
+```{r final_chart_m, fig.width = 9, fig.height = 8, fig.alt = "Ridgeline chart showing the rise and fall of each generation's most popular boy name (USA, 1901 - 2017). Greatest: John, Silent: Robert, Boomer: James, X: Michael, Millennial: Michael, Z: Jabob, Alpha: Noah."}
+
+# Chart for boys
+# Update base plot with data for males
+p_final_m <- p_base %+% top_gen_names_m +
+  # Fill colour for ridges
+  scale_fill_carto_c(
+    palette = "Teal", 
+    labels = scales::label_percent(accuracy = 1), 
+    guide = guide_colourbar(reverse = TRUE)
+    ) +
+  # Annotation text
+  geom_text(
+    data = filter(annotation_text,sex == "M"),
+    aes(x = x, y = y, label = label),
+    family = "Lato",
+    colour = "grey40",
+    nudge_y = 1.3,
+    size = 3.4,
+    hjust = 0.5
+    ) +
+  # Titles
+  labs(
+    title = "The rise and fall of each generation's most popular name: Boys, USA",
+    subtitle = "Percentage of boys, born in each year, with each of these names (1901 - 2017)"
+    )
+  
+p_final_m
+
+```
+
+Save the plots as images.  
+
+```{r save_image}
+
+# Tell showtext to use DPI of 320 so text size is correct when chart is saved as an image
+showtext_opts(dpi = 320)
+
+# Save plots as image
+ggsave("girl_names.png", p_final_f, width = 9, height = 7, units = "in", dpi = 320)
+ggsave("boy_names.png", p_final_m, width = 9, height = 8, units = "in", dpi = 320)
+
+# Turn off showtext
+showtext_auto(FALSE)
+
+```
+
+
+### Session Information
+```{r session_info}
+
+sessionInfo()
+
+```
+
