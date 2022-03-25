@@ -10,6 +10,11 @@ Apart from the odd dabble, I only really started using R in 2021 (I've been usin
 
 ## 2022
 
+### Week 12 - Baby Names (USA) [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W12_BabyNames/TT_2022_W12_BabyNames.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W12_BabyNames/README.md)
+![/2022/TT_2022_W12_BabyNames/girl_names.png](2022/TT_2022_W12_BabyNames/girl_names.png)
+![/2022/TT_2022_W12_BabyNames/boy_names.png](2022/TT_2022_W12_BabyNames/boy_names.png)
+------
+
 ### Week 9 - Alternative Fuel Stations [(code)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W9_AlternativeFuelStations/TT_2022_W9_AlternativeFuelStations.R) [(readme)](https://github.com/fi-lees/tidy_tuesday/blob/master/2022/TT_2022_W9_AlternativeFuelStations/README.md)
 ![/2022/TT_2022_W9_AlternativeFuelStations/EVsPerPort.png](2022/TT_2022_W9_AlternativeFuelStations/EVsPerPort.png)
 ------
